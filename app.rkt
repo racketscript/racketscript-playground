@@ -68,7 +68,8 @@
               ($$ res.status 500)
               ($$ res.send (unbox err))])))]
     [else
-     ($ ($$ res.status 400) 'send <$> "Bad Request")]))
+     ($> ($$ res.status 400)
+         (send "Bad Request"))]))
 
 ;;-----------------------------------------------------------------------------
 
@@ -77,7 +78,7 @@
 
   ($$ app.use ($$ express.static "static"))
 
-  ($$ app.use ($$ body-parser.urlencoded {$/obj ['extended #f]}))
+  ($$ app.use ($$ body-parser.urlencoded {$/obj [extended #f]}))
   ($$ app.use ($$ body-parser.json))
 
   ($$ app.get "/" handle-index)
