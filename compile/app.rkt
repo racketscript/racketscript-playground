@@ -1,6 +1,6 @@
-#lang racket/base
+#lang racketscript/base
 
-(require rapture/ffi
+(require racketscript/interop
          (for-syntax syntax/parse))
 
 
@@ -11,8 +11,7 @@
 (define child-process ($/require "child_process"))
 (define spawn ($ child-process 'spawn))
 
-(define console ($ 'global 'console))
-(define $/undefined ($ 'undefined))
+(define console #js.global.console)
 
 ;;-----------------------------------------------------------------------------
 (define PORT 8080)
@@ -20,16 +19,12 @@
 ;;-----------------------------------------------------------------------------
 ;; Handlers
 
-(define (handle-index req res)
-  ($$ res.send "Hello World!"))
-
-
 (define (handle-compile req res)
   (define racket-code (or ($ req 'body 'code) #f))
 
   (cond
     [racket-code
-     ($$ console.log "Compiling request.")
+     (#js.console.log "Compiling request.")
 
      (define rapture (spawn "rapture"
                             [$/array "-n"
@@ -43,32 +38,32 @@
 
      ;; Write to process input stream, followed by closing it
      ;; so that we get output
-     ($$ rapture.stdin.write racket-code)
-     ($$ rapture.stdin.end)
+     (#js.rapture.stdin.write racket-code)
+     (#js.rapture.stdin.end)
 
-     ($$ rapture.stdout.on "data"
+     (#js.rapture.stdout.on "data"
          (λ (data)
            (set-box! output (string-append (unbox output) data))))
 
-     ($$ rapture.stderr.on "data"
+     (#js.rapture.stderr.on "data"
          (λ (data)
            (set-box! err (string-append (unbox err) data))))
 
-     ($$ rapture.on "error"
+     (#js.rapture.on "error"
          (λ (err)
-           ($$ res.send "Error invoking compiler.")))
+           (#js.res.send "Error invoking compiler.")))
 
-     ($$ rapture.on "close"
+     (#js.rapture.on "close"
          (λ (code)
            (cond
              [(zero? code)
-              ($$ res.status 200)
-              ($$ res.send (unbox output))]
+              (#js.res.status 200)
+              (#js.res.send (unbox output))]
              [else
-              ($$ res.status 500)
-              ($$ res.send (unbox err))])))]
+              (#js.res.status 500)
+              (#js.res.send (unbox err))])))]
     [else
-     ($> ($$ res.status 400)
+     ($> (#js.res.status 400)
          (send "Bad Request"))]))
 
 ;;-----------------------------------------------------------------------------
@@ -76,17 +71,16 @@
 (define (main)
   (define app (express))
 
-  ($$ app.use ($$ express.static "static"))
+  (#js.app.use (#js.express.static "static"))
 
-  ($$ app.use ($$ body-parser.urlencoded {$/obj [extended #f]}))
-  ($$ app.use ($$ body-parser.json))
+  (#js.app.use (#js.body-parser.urlencoded {$/obj [extended #f]}))
+  (#js.app.use (#js.body-parser.json))
 
-  ($$ app.get "/" handle-index)
-  ($$ app.post "/compile" handle-compile)
+  (#js.app.post "/compile" handle-compile)
 
-  ($$ app.listen PORT
+  (#js.app.listen PORT
       (λ ()
-        ($$ console.log "Starting playground at port " PORT)))
+        (#js.console.log "Starting playground at port " PORT)))
 
   (void))
 
