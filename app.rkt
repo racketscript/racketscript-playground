@@ -29,7 +29,6 @@
      (define racks (spawn "racks"
                             [$/array "-n"
                                      "--js"
-                                     "--js-beautify"
                                      "--stdin"
                                      "--enable-self-tail"]))
 

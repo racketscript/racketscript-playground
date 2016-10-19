@@ -101,7 +101,7 @@ $(document).ready(function () {
         jsOutEditor.setValue("Compiling ....");
         $.post("/compile", { code: racketEditor.getValue() }, function(data) {
             isCompiling = false;
-            jsOutEditor.setValue(data);
+            jsOutEditor.setValue(js_beautify(data));
 	    if (execute === true) {
 		run();
 	    }
