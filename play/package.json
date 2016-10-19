@@ -1,0 +1,28 @@
+{
+    "name": "racketscript-playground",
+    "version": "0.0.1",
+    "description": "RacketScript demo",
+    "main": "./js-build/dist/modules/app.rkt.js",
+    "repository": {
+	"type": "git",
+	"url": "https://github.com/vishesh/racketscript-playground"
+    },
+    "keywords": [
+	"racket",
+	"compiler"
+    ],
+    "author": "Vishesh Yadav",
+    "bugs": {
+	"url": "https://github.com/vishesh/racketscript/issues"
+    },
+    "dependencies": [
+	"express",
+	"body-parser"
+    ],
+
+    "scripts": {
+        "build": "rapture --js-beautify --target babel --enable-self-tail app.rkt",
+        "quickbuild": "rapture -n --js-beautify --target babel --enable-self-tail app.rkt",
+        "run": "node ./js-build/dist/modules/app.rkt.js"
+    }
+}
