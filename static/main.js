@@ -102,7 +102,7 @@ $(document).ready(function () {
         $.post("/compile", { code: racketEditor.getValue() }, function(data) {
             isCompiling = false;
             jsOutEditor.setValue(data);
-	    if (execute) {
+	    if (execute === true) {
 		run();
 	    }
         })
