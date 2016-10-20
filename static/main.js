@@ -85,7 +85,7 @@ $(document).ready(function () {
 	    alert("Code not compiled!");
 	    return;
 	}
-	consoleLogEditor.setValue("Console Log\n");
+	consoleLogEditor.setValue("Console Log:\n");
 	runRacket(code);
     }
 
@@ -99,13 +99,21 @@ $(document).ready(function () {
         }, 3000);
 
         jsOutEditor.setValue("Compiling ....");
-        $.post("/compile", { code: racketEditor.getValue() }, function(data) {
-            isCompiling = false;
-            jsOutEditor.setValue(js_beautify(data));
-	    if (execute === true) {
-		run();
-	    }
-        })
+        $.post("/compile", { code: racketEditor.getValue() })
+            .done(function(data) {
+                jsOutEditor.setValue(js_beautify(data));
+                if (execute === true) {
+                    run();
+                }
+            })
+            .fail(function(xhr, status, err) {
+		consoleLogEditor.setValue("Compilation error:\n" +
+					  xhr.responseText);
+		jsOutEditor.setValue("");
+            })
+	    .always(function() {
+		isCompiling = false;
+	    });
     }
 
     $("#compile-btn").click(compile);

@@ -59,7 +59,7 @@
             (#js.res.status 200)
             (#js.res.send (unbox output))]
            [else
-            (#js.res.status 500)
+            (#js.res.status 400)
             (#js.res.send (unbox err))])))]
     [else
      ($> (#js.res.status 400)
