@@ -963,7 +963,6 @@ if (typeof module !== 'undefined' && module.exports) {
     define('hamt', [], function () {
         return hamt;
     });
-} else {
 }
 //# sourceMappingURL=hamt.js.map
 

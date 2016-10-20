@@ -98,6 +98,7 @@ $(document).ready(function () {
             isCompiling = false;
         }, 3000);
 
+	consoleLogEditor.setValue("Console Log:\n");
         jsOutEditor.setValue("Compiling ....");
         $.post("/compile", { code: racketEditor.getValue() })
             .done(function(data) {

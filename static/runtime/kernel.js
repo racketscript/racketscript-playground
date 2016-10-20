@@ -32,8 +32,8 @@ exports["values"] = function (...vals) {
     return Core.Values.make(vals);
 }
 
-exports["call-with-values"] = function (generator, receiver) {
-    var values = generator();
+var callWithValues = exports["call-with-values"] = function (generator, receiver) {
+    let values = generator();
     if (Core.Values.check(values)) {
 	return receiver.apply(this, generator().getAll());
     } else if (values !== undefined && values !== null) {
@@ -133,6 +133,9 @@ exports["null"] = Core.Pair.Empty;
 
 var list = exports["list"] = Core.Pair.makeList;
 exports["first"] = exports["car"]; //TODO: Should be list
+exports["second"] = function (lst) {
+    return lst.cdr().car();
+}
 exports["rest"] = exports["cdr"];
 
 exports["list?"] = function isList(v) {
@@ -144,6 +147,13 @@ exports["list?"] = function isList(v) {
     } else {
 	return false;
     }
+}
+
+exports["list*"] = function () {
+    return Core.Pair
+	.argumentsToArray(arguments)
+	.reverse()
+	.reduce((acc, v) => Core.Pair.make(v, acc));
 }
 
 exports["empty?"] = Core.Pair.isEmpty;
@@ -304,8 +314,9 @@ exports["hash-set"] = function (h, k, v) {
 /* --------------------------------------------------------------------------*/
 // Higher Order Functions
 
-exports["apply"] = function (lam, args) {
-    return lam.apply(null, Core.Pair.listToArray(args));
+exports["apply"] = function (lam, ...args) {
+    let lst = Core.Pair.listToArray(args.pop()); /* TODO: Check. Must be a list */
+    return lam.apply(null, args.concat(lst));
 }
 
 var reverse = exports["reverse"] = function (lst) {
@@ -430,8 +441,26 @@ exports["string=?"] = function (sa, sb) {
     return sa === sb;
 }
 
+exports["string?"] = function (v) {
+    return typeof(v) === 'string';
+}
+
 exports["format"] = function() {
     //TODO
+}
+
+exports["symbol->string"] = function (v) {
+    typeCheckOrRaise(Core.Symbol, v);
+    return v.toString();
+}
+
+exports["symbol?"] = function (v) {
+    return Core.Symbol.check(v);
+}
+
+exports["symbol=?"] = function (s, v) {
+    typeCheckOrRaise(Core.Symbol, s);
+    return s.equals(v);
 }
 
 /* --------------------------------------------------------------------------*/
@@ -586,7 +615,7 @@ exports["filter"] = function (fn, lst) {
 
 exports["abs"] = Math.abs;
 exports["floor"] = Math.floor;
-exports["ceil"] = Math.ceil;
+exports["ceiling"] = Math.ceil;
 exports["round"] = Math.round;
 exports["min"] = Math.min;
 exports["max"] = Math.max;
@@ -615,8 +644,77 @@ var append = exports["append"] = function (...lists) {
 
 exports["build-list"] = function (n, proc) {
     let result = Core.Pair.Empty;
-    for (let i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) { 
 	result = Core.Pair.make(proc(i), result);
     }
     return reverse(result);
+}
+
+exports["make-list"] = function (n, v) {
+    let result = Core.Pair.Empty;
+    for (let i = 0; i < n; ++i) {
+	result = Core.Pair.make(v, result);
+    }
+    return result;
+}
+
+exports["assoc"] = function (k, lst) {
+    while (Core.Pair.isEmpty(lst) === false) {
+	if (Core.isEqual(k, lst.hd.hd)) {
+	    return lst.hd;
+	}
+	lst = lst.tl;
+    }
+    return false;
+}
+
+var flatten = exports["flatten"] = function (lst) {
+    if (Core.Pair.isEmpty(lst)) {
+        return lst;
+    } else if (Core.Pair.check(lst)) {
+        return append(flatten(lst.hd), flatten(lst.tl));
+    } else {
+        return list(lst);
+    }
+};
+
+exports["current-seconds"] = function() {
+    return Math.floor(Date.now() / 1000);
+}
+
+exports["sqr"] = function (v) {
+    return v * v;
+}
+
+exports["remainder"] = function (a, b) {
+    return a % b;
+}
+
+exports["compose"] = function (...procs) {
+    return function () {
+	let result = Core.argumentsToArray(arguments);
+	for (let p of procs.reverse()) {
+	    result = p.apply(null, result);
+	    if (Core.Values.check(result)) {
+		result = result.getAll();
+	    } else {
+		result = [result]
+	    }
+	}
+	if (result.length === 1) {
+	    return result[0];
+	} else {
+	    return Core.Values.make(result);
+	}
+    }
+}
+
+exports["compose1"] = function(...procs) {
+    return function(v) {
+	let result = v;
+	for (let p of procs.reverse()) {
+	    result = p(result);
+	}
+	return result;
+    }
 }
