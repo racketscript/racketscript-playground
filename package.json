@@ -21,8 +21,8 @@
     ],
 
     "scripts": {
-        "build": "rapture --js-beautify --target babel --enable-self-tail app.rkt",
-        "quickbuild": "rapture -n --js-beautify --target babel --enable-self-tail app.rkt",
+        "build": "racks --js-beautify --target babel --enable-self-tail app.rkt",
+        "quickbuild": "racks -n --js-beautify --target babel --enable-self-tail app.rkt",
         "run": "node ./js-build/dist/modules/app.rkt.js"
     }
 }
