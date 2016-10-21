@@ -72,8 +72,9 @@
 
   (#js.app.use (#js.express.static "static"))
 
-  (#js.app.use (#js.body-parser.urlencoded {$/obj [extended #f]}))
-  (#js.app.use (#js.body-parser.json))
+  (#js.app.use (#js.body-parser.urlencoded {$/obj [extended #f]
+                                                  [limit "8mb"]}))
+  (#js.app.use (#js.body-parser.json {$/obj [limit "8mb"]}))
 
   (#js.app.post "/compile" handle-compile)
 
