@@ -97,6 +97,11 @@ exports["<="] = Core.Number.lte;
 exports[">="] = Core.Number.gte;
 exports["="] = Core.Number.equals;
 
+/* TODO: Support bignums */
+exports["exact->inexact"] = (v) => v;
+exports["expt"] = (w, z) => Math.pow(w, z);
+exports["sqrt"] = (v) => Math.sqrt(v);
+
 /* -------------------------------------------------------------------------*/
 // Boolean
 
@@ -463,6 +468,16 @@ exports["symbol=?"] = function (s, v) {
     return s.equals(v);
 }
 
+exports["string-length"] = function (v) {
+    if (typeof v !== 'string') {
+	throw Core.racketContractError("expected a string");
+    }
+    return v.length;
+}
+
+exports["string-downcase"] = (v) => v.toLowerCase(v);
+exports["string-upcase"] = (v) => v.toUpperCase(v);
+
 /* --------------------------------------------------------------------------*/
 // Box
 
@@ -615,6 +630,9 @@ exports["filter"] = function (fn, lst) {
 
 exports["abs"] = Math.abs;
 exports["floor"] = Math.floor;
+exports["sin"] = Math.sin;
+exports["cos"] = Math.cos;
+exports["tan"] = Math.tan;
 exports["ceiling"] = Math.ceil;
 exports["round"] = Math.round;
 exports["min"] = Math.min;
