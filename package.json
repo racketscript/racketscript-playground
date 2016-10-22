@@ -21,8 +21,8 @@
     ],
 
     "scripts": {
-        "build": "racks --js-beautify --target babel --enable-self-tail app.rkt",
-        "quickbuild": "racks -n --js-beautify --target babel --enable-self-tail app.rkt",
-        "run": "node ./js-build/dist/modules/app.rkt.js"
+        "build": "make build",
+        "quickbuild": "make quickbuild",
+        "run": "make run"
     }
 }
