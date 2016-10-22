@@ -7,7 +7,7 @@
 ;;----------------------------------------------------------------------------
 ;; Globals
 
-(define *split-gutter-size* 4)
+(define *split-gutter-size* 2)
   
 (define *racket-editor-id*        "racket-edit")
 (define *jsout-editor-id*         "jsout-edit")
@@ -73,8 +73,7 @@
   (set! cm-editor-console
         (create-editor *console-log-editor-id*
                        '([lineNumbers    #f]
-                         [readOnly       true]
-                         [mode           "scheme"])))
+                         [readOnly       true])))
   (set! cm-editor-jsout
         (create-editor *jsout-editor-id*
                        '([lineNumers     #t]
@@ -88,7 +87,7 @@
 
 (define (get-logger level)
   (λ args
-    (append-to-editor! cm-editor-console (++ "[" level "]"))
+    (append-to-editor! cm-editor-console (++ "[" level "] "))
     (for-each (λ (a)
                 (append-to-editor!
                  cm-editor-console (++ (cond
@@ -120,11 +119,11 @@
   (:= #js.run-frame.onload
       (λ ()
         (define doc #js.run-frame.contentWindow.document)
-        (define head ($ #js.doc.getElementsByTagName("head") 0))
+        (define head ($ (#js.doc.getElementsByTagName "head") 0))
         (define script (#js.doc.createElement "script"))
         (override-console run-frame)
         (:= #js.script.type "module")
-        (:= #js.script.text "code")
+        (:= #js.script.text code)
         (#js.head.appendChild script)
         (#js.run-frame.contentWindow.System.loadScriptTypeModule))))
 
@@ -136,7 +135,7 @@
           (run-racket code)]))
 
 (define (compile execute?)
-  (unless (or compiling? (> (- (#js*.Date.now) last-compile-time) 5000))
+  (when (or (not compiling?) (> (- (#js*.Date.now) last-compile-time) 5000))
     (:= compiling? #t)
     (#js*.setTimeout (λ ()
                        (:= compiling? #f))

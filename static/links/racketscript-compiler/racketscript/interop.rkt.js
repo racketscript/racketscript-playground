@@ -1,1 +1,0 @@
-import * as $rjs_core from '../../../runtime/core.js';import * as M0 from "../../../runtime/kernel.rkt.js";var __js_ffi = function() {var _225 = $rjs_core.Pair.listFromArray($rjs_core.argumentsToArray(arguments));return M0.error($rjs_core.Symbol.make("racketscript"),"can't make JS ffi calls in Racket");};export { __js_ffi };
