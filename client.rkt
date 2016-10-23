@@ -18,6 +18,7 @@
 
 ;; Gist
 (define *gist-source-file* "source.rkt")
+(define *gist-javascript-file* "compiled.js")
 
 ;; CodeMirror
 
@@ -143,6 +144,9 @@
 (define (set-racket-code code)
   (#js.cm-editor-racket.setValue code))
 
+(define (set-javascript-code code)
+  (#js.cm-editor-jsout.setValue (#js*.js_beautify code)))
+
 ;;-------------------------------------------------------------------------------
 ;; Ops
 
@@ -165,7 +169,7 @@
 (define (run)
   (define code (#js.cm-editor-jsout.getValue))
   (cond
-    [(equal? code "") (#js*.alert "Code not compiled!")]
+    [(equal? code "") (#js*.console.warn "Code not compiled!")]
     [else (#js.cm-editor-console.setValue "Console Log: \n")
           (run-racket code)]))
 
@@ -179,7 +183,7 @@
     (#js.cm-editor-jsout.setValue "Compiling ...")
     ($> (#js.jQuery.post "/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
         (done (λ (data)
-                (#js.cm-editor-jsout.setValue (#js*.js_beautify data))
+                (set-javascript-code data)
                 (when execute?
                   (run))))
         (fail (λ (xhr status err)
@@ -196,7 +200,13 @@
   ($> (#js.jQuery.get (++ "https://api.github.com/gists/" id))
       (done (λ (data)
               (set-racket-code ($ #js.data.files *gist-source-file* 'content))
-              (compile #t)))
+              (define jscode ($ #js.data.files *gist-javascript-file* 'content))
+              (cond
+                [(and jscode (not (equal? jscode "")))
+                 (set-javascript-code jscode)
+                 (run)]
+                [else
+                 (compile #t)])))
       (fail (λ (xhr)
               (show-error "Error load Gist"
                           (++ #js.xhr.responseJSON.message))))))
@@ -208,7 +218,9 @@
      [files
       (assoc->object
        `([,*gist-source-file* ,{$/obj
-                                [content (#js.cm-editor-racket.getValue)]}]))]})
+                                [content (#js.cm-editor-racket.getValue)]}]
+         [,*gist-javascript-file* ,{$/obj
+                                    [content (#js.cm-editor-jsout.getValue)]}]))]})
   ($> (#js.jQuery.post "https://api.github.com/gists" (#js*.JSON.stringify data))
       (done (λ (data)
               (define id #js.data.id)
@@ -230,10 +242,13 @@
 ;;-------------------------------------------------------------------------------
 
 (define (load-racket-example example-name)
-  ($> (#js.jQuery.get (++ "/examples/" example-name ".rkt"))
+  ($> (#js.jQuery.get (format "/examples/~a.rkt" example-name))
       (done (λ (data)
-              (set-racket-code data)
-              (compile #t)))))
+              (set-racket-code data))))
+  ($> (#js.jQuery.get (format "/examples/~a.rkt.js" example-name))
+      (done (λ (data)
+              (set-javascript-code data)
+              (run)))))
 
 (define (reset-ui!)
   ;; Reset editors
