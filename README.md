@@ -1,12 +1,14 @@
-Racketscript Demo
-=================
+Racketscript Playground
+=======================
 
-Hosted at http://rapture.twistedplane.com:8080
+Playground for [RacketScript](https://github.com/vishesh/racketscript).
+Visit http://rapture.twistedplane.com:8080 to try.
 
 ## Instructions
 
-To install and run:
+After installing RacketScript, execute following commands to install
+and run playground:
 
     $ npm install
-    $ npm run-script build
-    $ npm run-script run
+    $ make setup build
+    $ make run
