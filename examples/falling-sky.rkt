@@ -1,5 +1,7 @@
 #lang racketscript/base
 
+;; Falling Sky example from Danny Yoo's Whalesong
+
 (require racketscript/htdp/universe
          racketscript/htdp/image
          racketscript/interop
