@@ -40,17 +40,17 @@
 
 (define (init-split-layout!)
   (#js*.Split [$/array "#left-container" "#right-container"]
-              ($/obj [direction    "horizontal"]
+              {$/obj [direction    "horizontal"]
                      [sizes        [$/array 50 50]]
-                     [gutterSize   *split-gutter-size*]))
+                     [gutterSize   *split-gutter-size*]})
   (#js*.Split [$/array "#play-container" "#console-log-container"]
-              ($/obj [direction    "vertical"]
+              {$/obj [direction    "vertical"]
                      [sizes        [$/array 75 25]]
-                     [gutterSize   *split-gutter-size*]))
+                     [gutterSize   *split-gutter-size*]})
   (#js*.Split [$/array "#racket-container" "#jsout-container"]
-              ($/obj [direction    "vertical"]
+              {$/obj [direction    "vertical"]
                      [sizes        [$/array 75 25]]
-                     [gutterSize   *split-gutter-size*])))
+                     [gutterSize   *split-gutter-size*]}))
 
 (define (register-button-events!)
   ($> (jQuery "#btn-compile")
@@ -106,12 +106,12 @@
                          [readOnly       true])))
   (set! cm-editor-jsout
         (create-editor *jsout-editor-id*
-                       '([lineNumers     #t]
+                       '([lineNumbers    #t]
                          [readOnly       #f]
                          [mode           "javascript"]))))
 
 (define (append-to-editor! editor str)
-  (#js.editor.replaceRange str ($/obj [line +inf.0])))
+  (#js.editor.replaceRange str {$/obj [line +inf.0]}))
 
 ;;-------------------------------------------------------------------------------
 ;; Console

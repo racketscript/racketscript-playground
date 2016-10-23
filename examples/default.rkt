@@ -48,10 +48,10 @@
 
 ;; $> is exported by racketscript/interop to make chaining more
 ;; convenient.
-($> (#js.jquery document)
+($> (jquery document)
     (ready (λ ()
              (#js.console.log "DOM loaded!")
-             ($> (#js.jquery "body")
+             ($> (jquery "body")
                  (append (sexp->jq
                            `(div
                              (h1 ([align "center"])
