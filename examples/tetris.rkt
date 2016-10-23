@@ -310,13 +310,14 @@
 ;; Visualize whirled peas
 ;; World -> Scene
 (define (world->image w)
-  (place-image (blocks->image (append (tetra-blocks (world-tetra w))
-                                      (append (ghost-blocks w)
-                                              (world-blocks w))))
-               (/ (* board-width block-size) 2)
-               (/ (* board-height block-size) 2)
-               (empty-scene (* board-width block-size)
-                            (* board-height block-size))))
+  (frame
+   (place-image (blocks->image (append (tetra-blocks (world-tetra w))
+                                       (append (ghost-blocks w)
+                                               (world-blocks w))))
+                (/ (* board-width block-size) 2)
+                (/ (* board-height block-size) 2)
+                (empty-scene (* board-width block-size)
+                             (* board-height block-size)))))
 
 ;; BSet -> Scene
 (define (blocks->image bs)

@@ -19,7 +19,7 @@
 ;; `window.document`"
 (define jquery #js*.$)
 
-;; Here's a toy function to xexpr to DOM element using jQuery.
+;; Here's a toy function to convert xexpr to DOM element using jQuery.
 (define (sexp->jq sexp)
   (define (add-attrs jq attr-names attr-vals)
     (foldl (λ (name val jq)
@@ -49,24 +49,24 @@
 ;; $> is exported by racketscript/interop to make chaining more
 ;; convenient.
 ($> (jquery document)
-    (ready (λ ()
-             (#js.console.log "DOM loaded!")
-             ($> (jquery "body")
-                 (append (sexp->jq
-                           `(div
-                             (h1 ([align "center"])
-                                 "Hello World!")
-                             (div
-                              (ul
-                               (li (a ([href "https://github.com/vishesh/racketscript"]
-                                       [target "_blank"])
-                                      "RacketScript on Github"))
-                               (li (a ([href "https://github.com/vishesh/racketscript-playground"]
-                                       [target "_blank"])
-                                      "Playground on Github"))
-                               (li (a ([href "http://www.racket-lang.org/"]
-                                       [target "_blank"])
-                                      "Racket Programming Language"))))))))))
+    (ready
+     (λ ()
+       (#js.console.log "DOM loaded!")
+       ($> (jquery "body")
+           (append (sexp->jq
+                    `(div
+                      (h1 ([align "center"]) "Hello World!")
+                      (div
+                       (ul
+                        (li (a ([href "https://github.com/vishesh/racketscript"]
+                                [target "_blank"])
+                               "RacketScript on Github"))
+                        (li (a ([href "https://github.com/vishesh/racketscript-playground"]
+                                [target "_blank"])
+                               "Playground on Github"))
+                        (li (a ([href "http://www.racket-lang.org/"]
+                                [target "_blank"])
+                               "Racket Programming Language"))))))))))
     (on "click"
         (λ (e)
           (displayln (list "clicked at: " #js.e.pageX #js.e.pageY)))))

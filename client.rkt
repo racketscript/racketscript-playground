@@ -10,7 +10,7 @@
 ;;----------------------------------------------------------------------------
 ;; Globals
 
-(define *split-gutter-size* 2)
+(define *split-gutter-size* 3)
 
 (define *racket-editor-id*        "racket-edit")
 (define *jsout-editor-id*         "jsout-edit")
