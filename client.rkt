@@ -82,6 +82,7 @@
      (append options
              `([theme          ,*cm-theme*]
                [matchBrackets  ,#t]
+               [scrollbarStyle "simple"]
                [extraKeys
                 ,{$/obj ["F11" (λ (cm)
                                  (toggle-editor-fullscreen cm))]
