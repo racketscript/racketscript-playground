@@ -1,25 +1,36 @@
-.PHONY: build quickbuild run setup
+.PHONY: build quickbuild run setup build-client build-server clean _build
 
 FLAGS=--enable-self-tail --js-beautify
 
-setup:
-	racks -d _tmp stub.rkt
+clean:
 	rm -rf static/runtime
 	rm -rf static/links
-	cp -a _tmp/runtime static/
-	cp -a _tmp/links/ static/
-	rm -rf _tmp
+	rm -rf out-runtime
+	rm -rf client-out
+	rm -rf js-build
 
-build:
-	make setup
-	racks $(FLAGS) --target babel app.rkt
-	racks $(FLAGS) -d client-out client.rkt
+setup:
+	npm install
+	racks -d out-runtime stub.rkt
+	cp -a out-runtime/runtime static/
+	cp -a out-runtime/links/ static/
+
+build-client:
+	racks $(FLAGS) $(ARGS) -d client-out client.rkt
 	cp client-out/dist/compiled.js static/main.js
+
+build-server:
+	racks $(FLAGS) $(ARGS) --target babel app.rkt
+
+_build:
+	make ARGS=$(ARGS) build-client build-server
+
+build: _build
 
 quickbuild:
-	racks $(FLAGS) -n --target babel app.rkt
-	racks $(FLAGS) -nd client-out client.rkt
-	cp client-out/dist/compiled.js static/main.js
+	make ARGS=-n _build
 
 run:
 	node ./js-build/dist/modules/app.rkt.js
+
+fireup: clean setup build run
