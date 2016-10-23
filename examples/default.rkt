@@ -58,11 +58,14 @@
                                  "Hello World!")
                              (div
                               (ul
-                               (li (a ([href "https://github.com/vishesh/racketscript"])
+                               (li (a ([href "https://github.com/vishesh/racketscript"]
+                                       [target "_blank"])
                                       "RacketScript on Github"))
-                               (li (a ([href "https://github.com/vishesh/racketscript-playground"])
+                               (li (a ([href "https://github.com/vishesh/racketscript-playground"]
+                                       [target "_blank"])
                                       "Playground on Github"))
-                               (li (a ([href "http://www.racket-lang.org/"])
+                               (li (a ([href "http://www.racket-lang.org/"]
+                                       [target "_blank"])
                                       "Racket Programming Language"))))))))))
     (on "click"
         (λ (e)
