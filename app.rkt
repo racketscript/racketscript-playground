@@ -71,6 +71,7 @@
   (define app (express))
 
   (#js.app.use (#js.express.static "static"))
+  (#js.app.use "/examples" (#js.express.static "examples"))
 
   (#js.app.use (#js.body-parser.urlencoded {$/obj [extended #f]
                                                   [limit "8mb"]}))

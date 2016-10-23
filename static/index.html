@@ -25,11 +25,13 @@
   <!-- CodeMirror -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/theme/neat.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/display/fullscreen.css" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/mode/scheme/scheme.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/mode/javascript/javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/display/fullscreen.min.js"></script>
 
   <!-- Traceur -->
   <script src="https://google.github.io/traceur-compiler/bin/traceur-runtime.js"></script>
@@ -46,9 +48,9 @@
 
 <body>
   <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
+    <div class="nav-container">
       <div class="navbar-header">
-        <a href="#" class="navbar-brand">RacketScript</a>
+        <a href="#" class="navbar-brand">RacketScript Playground</a>
         <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -56,30 +58,49 @@
           </button>
       </div>
       <div class="navbar-collapse collapse" id="navbar-main">
+	<ul class="nav navbar-nav navbar-left">
+	  <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Examples <span class="caret"></span></a>
+	    <ul class="dropdown-menu" id="example-menu">
+	      <li><a href="#example/default">Default</a></li>
+	      <li><a href="#example/pattern-matching">Pattern Matching</a></li>
+	      <li><a href="#example/factorial">Factorial</a></li>
+	      <li><a href="#example/flappy-birds">Flappy Birds</a></li>
+	      <li><a href="#example/2048-game">2048 Game</a></li>
+	      <li><a href="#example/tetris">Tetris</a></li>
+	    </ul>
+	  </li>
+	  <li><a href="https://github.com/vishesh/racketscript" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> RacketScript on Github</a></li>
+	  <li><a href="https://github.com/vishesh/racketscript-playground" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> Playground on Github</a></li>
+        </ul>
+
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="#" id="compile-btn">Compile</a></li>
-          <li><a href="#" id="run-btn">Run</a></li>
-          <li><a href="#" id="compile-run-btn">Compile + Run</a></li>
+          <li><a href="#" id="btn-save"><span class="glyphicon glyphicon-save" aria-hidden="true"></span> Save</a></li>
+          <li><a href="#" id="btn-compile"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Compile</a></li>
+          <li><a href="#" id="btn-run"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Run</a></li>
+          <li><a href="#" id="btn-compile-run"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Compile + Run</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
+  <div id="error-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+	<div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Error</h4>
+	</div>
+	<div class="modal-body">
+          <p></p>
+	</div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
   <div class="line">
     <div id="left-container" class="split split-horizontal">
       <div id="racket-container" class="split">
-	<textarea id="racket-edit" class="editor">
-#lang racket/base
-
-(define (factorial n)
-  (let loop ([n n]
-             [a 1])
-    (if (zero? n)
-        a
-        (loop (sub1 n) (* n a)))))
-
-(displayln (factorial 6))
-	</textarea>
+	<textarea id="racket-edit" class="editor"></textarea>
       </div>
 
       <div id="jsout-container" class="split">
@@ -88,12 +109,11 @@
     </div>
 
     <div id="right-container" class="split split-horizontal">
+      <div id="play-container" class="split">
+	<iframe id="run-area" src="modules/index.html" scrolling="auto"></iframe>
+      </div>
       <div id="console-log-container" class="split">
 	<textarea id="console-log-edit" class="editor">Console Log:</textarea>
-      </div>
-
-      <div id="play-container" class="split">
-	<iframe id="run-area" src="modules/index.html" scrolling="auto" />
       </div>
     </div>
 
