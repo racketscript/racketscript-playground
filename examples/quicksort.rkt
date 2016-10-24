@@ -1,10 +1,5 @@
 #lang racket
 
-(define (append lst-a lst-b)
-  (match lst-a
-    ['() lst-b]
-    [(cons hd tl) (cons hd (append tl lst-b))]))
-
 (define (partition cmp pivot lst)
   (let loop ([lst lst]
              [part-a '()]
