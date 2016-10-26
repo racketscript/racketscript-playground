@@ -22,7 +22,7 @@ setup:
 build-examples:
 	for eg in `ls examples/*.rkt`; do \
 		echo "compiling $$eg"; \
-		racks -ngd out-examples $$eg; \
+		racks --enable-self-tail -ngd out-examples $$eg; \
 	done
 	cp -a out-examples/modules/*.rkt.js examples/
 
