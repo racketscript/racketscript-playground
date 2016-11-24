@@ -145,7 +145,8 @@
   (#js.cm-editor-racket.setValue code))
 
 (define (set-javascript-code code)
-  (#js.cm-editor-jsout.setValue (#js*.js_beautify code)))
+  (#js.cm-editor-jsout.setValue (#js*.js_beautify code
+                                                  {$/obj [indent_size 2]})))
 
 ;;-------------------------------------------------------------------------------
 ;; Ops
