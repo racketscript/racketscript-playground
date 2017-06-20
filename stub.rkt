@@ -1,4 +1,4 @@
-#lang racketscript/base
+#lang racket
 
 ;; Hack to compile all runtime files
 
@@ -19,3 +19,19 @@ square
 
 ;; universe
 big-bang
+
+;; list
+foldr
+make-list
+
+;; boolean
+true
+false
+
+;; match
+(match '(1 2)
+  [`(,a ,b) (+ a b)])
+
+;; for
+(for ([i '(1 2 3)])
+  (displayln i))

@@ -1,6 +1,6 @@
 .PHONY: build quickbuild run setup build-client build-server clean _build
 
-FLAGS=--enable-self-tail --js-beautify
+FLAGS=--enable-self-tail --enable-flatten-if --js-beautify
 
 fireup: clean setup build run
 
@@ -17,6 +17,7 @@ setup:
 	racks -d out-runtime stub.rkt
 	cp -a out-runtime/runtime static/
 	cp -a out-runtime/links/ static/
+	cp -a out-runtime/collects/ static/
 	make build-examples
 
 build-examples:
