@@ -24,64 +24,64 @@
 
   (cond
     [racket-code
-     (#js.console.log "Compiling request.")
+     (#js.console.log #js"Compiling request.")
 
-     (define racks (spawn "racks"
-                            [$/array "-n"
-                                     "--js"
-                                     "--stdin"
-                                     "--enable-self-tail"]))
+     (define racks (spawn #js"racks"
+                            [$/array #js"-n"
+                                     #js"--js"
+                                     #js"--stdin"
+                                     #js"--enable-self-tail"]))
 
-     (define output (box ""))
-     (define err    (box ""))
+     (define output #js"")
+     (define err    #js"")
 
      ;; Write to process input stream, followed by closing it
      ;; so that we get output
      (#js.racks.stdin.write racket-code)
      (#js.racks.stdin.end)
 
-     (#js.racks.stdout.on "data"
+     (#js.racks.stdout.on #js"data"
        (λ (data)
-         (set-box! output (string-append (unbox output) data))))
+         ($/:= output ($/binop + output data))))
 
-     (#js.racks.stderr.on "data"
+     (#js.racks.stderr.on #js"data"
        (λ (data)
-         (set-box! err (string-append (unbox err) data))))
+         ($/:= err ($/binop + err data))))
 
-     (#js.racks.on "error"
+     (#js.racks.on #js"error"
        (λ (err)
-         (#js.res.send "Error invoking compiler.")))
+         (#js.res.send #js"Error invoking compiler.")))
 
-     (#js.racks.on "close"
+     (#js.racks.on #js"close"
        (λ (code)
          (cond
            [(zero? code)
             (#js.res.status 200)
-            (#js.res.send (unbox output))]
+            (#js.res.send output)]
            [else
             (#js.res.status 400)
-            (#js.res.send (unbox err))])))]
+            (#js.res.send err)])))]
     [else
      ($> (#js.res.status 400)
-         (send "Bad Request"))]))
+         (send #js"Bad Request"))]))
 
 ;;-----------------------------------------------------------------------------
 
 (define (main)
   (define app (express))
 
-  (#js.app.use (#js.express.static "static"))
-  (#js.app.use "/examples" (#js.express.static "examples"))
+  (#js.app.use (#js.express.static #js"static"))
+  (#js.app.use #js"/examples" (#js.express.static #js"examples"))
 
   (#js.app.use (#js.body-parser.urlencoded {$/obj [extended #f]
-                                                  [limit "8mb"]}))
-  (#js.app.use (#js.body-parser.json {$/obj [limit "8mb"]}))
+                                                  [limit #js"8mb"]}))
+  (#js.app.use (#js.body-parser.json {$/obj [limit #js"8mb"]}))
 
-  (#js.app.post "/compile" handle-compile)
+  (#js.app.post #js"/compile" handle-compile)
 
   (#js.app.listen PORT
       (λ ()
-        (#js.console.log "Starting playground at port " PORT)))
+        (#js.console.log #js"Starting playground at port" PORT)))
 
   (void))
 

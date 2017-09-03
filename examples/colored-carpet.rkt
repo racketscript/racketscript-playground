@@ -12,9 +12,9 @@
   ($> (jquery document)
       (ready
        (λ ()
-         ($> (jquery "body")
-             (css "margin" 0)
-             (css "padding" 0))
+         ($> (jquery #js"body")
+             (css #js"margin" 0)
+             (css #js"padding" 0))
          (print-image (welcome-image))))))
 
 ;; (Listof Color) -> Image
