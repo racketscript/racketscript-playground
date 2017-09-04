@@ -1,48 +1,44 @@
-.PHONY: build quickbuild run setup build-client build-server clean _build
+.PHONY: quickbuild clean run setup
+RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
 
-FLAGS=--enable-self-tail --enable-flatten-if --js-beautify
+build: build/client build/server
 
-fireup: clean setup build run
+quickbuild: RACKS_ARGS = -n
+quickbuild: build
 
-build: build-examples _build
+run: build
+	node ./build/server/dist/modules/app.rkt.js
+quickrun: quickbuild
+	node ./build/server/dist/modules/app.rkt.js
 
-quickbuild:
-	make ARGS=-n _build
-
-run:
-	node ./js-build/dist/modules/app.rkt.js
-
-setup:
+node_modules: package.json
 	npm install
-	racks -d out-runtime stub.rkt
-	cp -a out-runtime/runtime static/
-	cp -a out-runtime/links/ static/
-	cp -a out-runtime/collects/ static/
-	make build-examples
+examples/%.rkt.js: examples/%.rkt
+	@echo "Compiling $<..."
+	racks $(RACKS_FLAGS) -ngd build/examples $<
+	cp build/examples/modules/$*.rkt.js examples/
+build/examples: $(addsuffix .js,$(filter-out examples/default.rkt,\
+$(wildcard examples/*.rkt)))
 
-build-examples:
-	for eg in `ls examples/*.rkt`; do \
-		echo "compiling $$eg"; \
-		racks --enable-self-tail -ngd out-examples $$eg; \
-	done
-	cp -a out-examples/modules/*.rkt.js examples/
+static/main.js: client.rkt
+	@echo "Compiling the client..."
+	racks $(RACKS_FLAGS) $(RACKS_ARGS) -d build/client client.rkt
+	cp build/client/dist/compiled.js static/main.js
+build/runtime: stub.rkt
+	racks -d build/runtime stub.rkt
+static/runtime: | build/runtime
+	ln -sf ../build/runtime/runtime static/runtime
+static/links: | build/runtime
+	ln -sf ../build/runtime/links static/links
+static/collects: | build/runtime
+	ln -sf ../build/runtime/collects static/collects
+build/client: build/examples static/main.js node_modules | static/runtime static/links static/collects
 
-build-client:
-	racks $(FLAGS) $(ARGS) -d client-out client.rkt
-	cp client-out/dist/compiled.js static/main.js
-
-build-server:
-	racks $(FLAGS) $(ARGS) --target babel app.rkt
-
-_build:
-	make ARGS=$(ARGS) build-client build-server
+build/server: app.rkt
+	@echo "Compiling the server..."
+	racks $(RACKS_FLAGS) $(RACKS_ARGS) -d build/server --target babel app.rkt
 
 clean:
-	rm -rf static/runtime
-	rm -rf static/links
-	rm -rf out-runtime
-	rm -rf client-out
-	rm -rf js-build
-	rm -rf examples/*.js
-	rm -rf out-examples
+	rm -f static/runtime static/links static/collects
+	rm -rf build/ **/*.rkt.js static/main.js
 

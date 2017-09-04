@@ -16,31 +16,22 @@ file must be `source.rkt`.
   `$ROOT_URL/examples/:id.rkt` from server.
 - A `POST /compile` request will take JSON payload of format: `{
   "code": <racket-code> }` and return a compiled JS file in reponse.
-  
+
 [CoreMirror](https://codemirror.net/) is used as editor
 component. Search and Replace shortcuts
 are [here](https://codemirror.net/demo/search.html).
 
-## Installation
+## Usage
 
 After installing Racket, NodeJS, and RacketScript, execute following
-commands to install and run playground:
+commands to run the playground:
 
-	$ make fireup
+	$ make -j 4 run
 
-Or, if you wish to do it step by step:
+For development, you can use `quickrun`, after runnning `run` once,
+for building both server and client without npm install/update:
 
-    $ make setup build
-    $ make run
-
-For development, you can use:
-
-	# for building both server and client without npm install/update
-	$ make quickbuild
-
-	# for building server and client individually
-	$ make build-server
-	$ make build-client
+	$ make -j 4 quickrun
 
 ## License
 
