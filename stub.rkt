@@ -28,6 +28,9 @@ make-list
 true
 false
 
+;; math
+pi
+
 ;; match
 (match '(1 2)
   [`(,a ,b) (+ a b)])

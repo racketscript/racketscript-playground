@@ -12,6 +12,11 @@
   <script src="https://google.github.io/traceur-compiler/bin/BrowserSystem.js"></script>
 
   <title>Rapture Run</title>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      window.parent.postMessage('run-iframe-init', window.location.origin);
+    });
+  </script>
 </head>
 
 <body>
