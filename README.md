@@ -26,12 +26,16 @@ are [here](https://codemirror.net/demo/search.html).
 After installing Racket, NodeJS, and RacketScript, execute following
 commands to run the playground:
 
-	$ make -j 4 run
+```bash
+make -j4 run
+```
 
 For development, you can use `quickrun`, after runnning `run` once,
 for building both server and client without npm install/update:
 
-	$ make -j 4 quickrun
+```bash
+make -j4 quickrun
+```
 
 ## License
 

@@ -34,6 +34,8 @@
 (define last-compile-time    (#js*.Date.now))
 
 (define-syntax := (make-rename-transformer #'$/:=))
+(define run-frame-init-handler (λ ()
+  (#js*.console.error #js"Run frame init handler called too early")))
 
 ;;-------------------------------------------------------------------------------
 ;; UI
@@ -128,8 +130,7 @@
                 (append-to-editor! cm-editor-console #js"\n"))
               args)))
 
-(define (override-console frame)
-  (define frame-win #js.frame.contentWindow)
+(define (override-console frame-win)
   (define new-con {$/obj [log    (get-logger "log")]
                          [debug  (get-logger "debug")]
                          [error  (get-logger "error")]
@@ -153,16 +154,10 @@
   (define src #js.run-frame.src)
   (:= #js.run-frame.src #js"")
   (:= #js.run-frame.src src)
-  (:= #js.run-frame.onload
-      (λ ()
-        (define doc #js.run-frame.contentWindow.document)
-        (define head (#js.doc.querySelector #js"head"))
-        (define script (#js.doc.createElement #js"script"))
-        (override-console run-frame)
-        (:= #js.script.type #js"module")
-        (:= #js.script.text code)
-        (#js.head.appendChild script)
-        (#js.run-frame.contentWindow.System.loadScriptTypeModule))))
+  (set! run-frame-init-handler
+    (λ (event)
+      (override-console #js.event.source)
+      (#js.event.source.System.module code))))
 
 (define (run)
   (define code (#js.cm-editor-jsout.getValue))
@@ -272,13 +267,16 @@
     [else (load-racket-example #js"blank")]))
 
 (define (main)
-  ($> (jQuery document)
-      (ready (λ ()
-               (init-editors!)
-               (init-split-layout!)
-               (register-button-events!)
-               (load-racket-code))))
-  ($> (jQuery window)
-      (on #js"hashchange" load-racket-code)))
+  (#js*.document.addEventListener #js"DOMContentLoaded"
+    (λ ()
+      (init-editors!)
+      (init-split-layout!)
+      (register-button-events!)
+      (load-racket-code)))
+  (#js*.window.addEventListener #js"hashchange" load-racket-code))
+  (#js*.window.addEventListener #js"message"
+    (λ (event)
+      (when ($/binop === #js.event.data #js"run-iframe-init")
+      (run-frame-init-handler event))))
 
 (main)
