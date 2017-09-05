@@ -1,7 +1,3 @@
-**/*.rkt.js
+examples/*.rkt.js
 /node_modules/
 /build
-/static/main.js
-/static/runtime
-/static/collects
-/static/links
