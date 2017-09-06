@@ -1,1 +1,0 @@
-colored-carpet.rkt

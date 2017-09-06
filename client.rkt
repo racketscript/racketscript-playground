@@ -264,7 +264,11 @@
   (case (racket-string ($ parts 0))
     [("gist") (load-gist ($ parts 1))]
     [("example") (load-racket-example ($ parts 1))]
-    [else (load-racket-example #js"blank")]))
+    [else
+      (let ([first-example
+             ($ ($> (#js.document.querySelector #js"#example-menu a") hash
+                    (split #js"/")) 1)])
+        (load-racket-example first-example))]))
 
 (define (main)
   (#js*.document.addEventListener #js"DOMContentLoaded"
