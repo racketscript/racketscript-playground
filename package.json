@@ -4,22 +4,21 @@
     "description": "RacketScript demo",
     "main": "./js-build/dist/modules/app.rkt.js",
     "repository": {
-	"type": "git",
-	"url": "https://github.com/vishesh/racketscript-playground"
+        "type": "git",
+        "url": "https://github.com/vishesh/racketscript-playground"
     },
     "keywords": [
-	"racket",
-	"compiler"
+        "racket",
+        "compiler"
     ],
     "author": "Vishesh Yadav",
     "bugs": {
-	"url": "https://github.com/vishesh/racketscript/issues"
+        "url": "https://github.com/vishesh/racketscript/issues"
     },
     "dependencies": [
-	"express",
-	"body-parser"
+        "express",
+        "body-parser"
     ],
-
     "scripts": {
         "build": "make build",
         "quickbuild": "make quickbuild",
