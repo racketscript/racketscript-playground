@@ -14,8 +14,8 @@ build: build/client build/server
 build/server: app.rkt | node_modules
 	@echo "Compiling the server..."
 	racks $(RACKS_FLAGS) $(RACKS_ARGS) -d build/server --target babel app.rkt
-node_modules: package.json
-	npm install
+node_modules: package.json package-lock.json
+	npm install && touch node_modules
 
 build/client: client.rkt | build/runtime build/examples
 	@echo "Compiling the client..."
