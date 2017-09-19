@@ -1,5 +1,6 @@
 .PHONY: quickbuild quickrun run clean
 RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
+RACKS_APP_FLAGS = --skip-arity-checks
 
 run: build
 	node ./build/server/dist/modules/app.rkt.js
@@ -13,13 +14,13 @@ build: build/client build/server
 
 build/server: app.rkt | node_modules
 	@echo "Compiling the server..."
-	racks $(RACKS_FLAGS) $(RACKS_ARGS) -d build/server --target babel app.rkt
+	racks $(RACKS_FLAGS) $(RACKS_ARGS) $(RACKS_APP_FLAGS) -d build/server --target babel app.rkt
 node_modules: package.json package-lock.json
 	npm install && touch node_modules
 
 build/client: client.rkt | build/runtime build/examples
 	@echo "Compiling the client..."
-	racks $(RACKS_FLAGS) $(RACKS_ARGS) -d build/client client.rkt
+	racks $(RACKS_FLAGS) $(RACKS_ARGS) $(RACKS_APP_FLAGS) -d build/client client.rkt
 
 build/runtime: stub.rkt
 	@echo "Compiling the runtime..."

@@ -38,3 +38,11 @@ pi
 ;; for
 (for ([i '(1 2 3)])
   (displayln i))
+
+sort
+
+displayln
+
+print
+
+write
