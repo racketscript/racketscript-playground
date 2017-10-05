@@ -23,7 +23,7 @@
 (define (sexp->jq sexp)
   (define (add-attrs jq attr-names attr-vals)
     (foldl (λ (name val jq)
-             (#js.jq.attr name val))
+             (#js.jq.attr ($/str name) ($/str val)))
            jq
            attr-names
            attr-vals))
@@ -37,22 +37,23 @@
            (list [list (app symbol->string attr-names) (app sexp->jq attr-vals)] ...)
            (app sexp->jq childs) ...)
      (~> (format "<~a></~a>" tag-name tag-name)
+         ($/str _)
          (jquery _)
          (add-attrs _ attr-names attr-vals)
          (add-childs _ childs))]
     [(list tag-name childs ...)
      (sexp->jq `(,tag-name () ,@childs))]
-    [(? string? v) v]
-    [(? number? v) (number->string v)]))
+    [(? string? v) ($/str v)]
+    [(? number? v) ($/str (number->string v))]))
 
 
 ;; $> is exported by racketscript/interop to make chaining more
 ;; convenient.
 ($> (jquery document)
     (ready
-     (λ ()
-       (#js.console.log "DOM loaded!")
-       ($> (jquery "body")
+     (λ _
+       (displayln "DOM loaded!")
+       ($> (jquery #js"body")
            (append (sexp->jq
                     `(div
                       (h1 ([align "center"]) "Hello World!")
@@ -67,7 +68,7 @@
                         (li (a ([href "http://www.racket-lang.org/"]
                                 [target "_blank"])
                                "Racket Programming Language"))))))))))
-    (on "click"
+    (on #js"click"
         (λ (e)
           (displayln (list "clicked at: " #js.e.pageX #js.e.pageY)))))
 
