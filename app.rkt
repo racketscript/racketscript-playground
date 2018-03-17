@@ -55,7 +55,7 @@
      (#js.racks.on #js"close"
        (λ (code)
          (cond
-           [(zero? code)
+           [(equal? code 0)
             (#js.res.status 200)
             (#js.res.send output)]
            [else
