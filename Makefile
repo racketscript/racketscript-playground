@@ -4,6 +4,9 @@ RACKS_APP_FLAGS = --skip-arity-checks
 
 run: build
 	node ./build/server/dist/modules/app.rkt.js
+run-forever: build
+	while true; do make run; sleep 1; done
+
 quickrun: quickbuild
 	node ./build/server/dist/modules/app.rkt.js
 
