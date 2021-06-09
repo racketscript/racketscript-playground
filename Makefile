@@ -3,12 +3,12 @@ RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
 RACKS_APP_FLAGS = --skip-arity-checks
 
 run: build
-	node ./build/server/dist/modules/app.rkt.js
+	node ./build/server/modules/app.rkt.js
 run-forever: build
 	while true; do make run; sleep 1; done
 
 quickrun: quickbuild
-	node ./build/server/dist/modules/app.rkt.js
+	node ./build/server/modules/app.rkt.js
 
 quickbuild: RACKS_ARGS = -n
 quickbuild: build
