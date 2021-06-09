@@ -32,7 +32,7 @@ build/runtime: stub.rkt
 build/examples: $(addsuffix .js,$(wildcard examples/*.rkt))
 examples/%.rkt.js: examples/%.rkt
 	@echo "Compiling $<..."
-	racks $(RACKS_FLAGS) -ngd build/examples $<
+	racks $(RACKS_FLAGS) -nd build/examples $<
 	cp build/examples/modules/$*.rkt.js examples/
 
 clean:
