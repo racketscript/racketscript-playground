@@ -157,7 +157,10 @@
   (set! run-frame-init-handler
     (λ (event)
       (override-console #js.event.source)
-      (#js.event.source.System.module code))))
+      (define newscript (#js.document.createElement "script"))
+      (#js.newscript.setAttribute "type" "module")
+      (:= #js.newscript.textContent code)
+      (#js.run-frame.contentDocument.head.append newscript))))
 
 (define (run)
   (define code (#js.cm-editor-jsout.getValue))
