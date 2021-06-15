@@ -15,10 +15,10 @@
     "bugs": {
         "url": "https://github.com/vishesh/racketscript/issues"
     },
-    "dependencies": [
-        "express",
-        "body-parser"
-    ],
+    "dependencies": {
+        "express": "^4.17.1",
+        "body-parser": "*"
+    },
     "scripts": {
         "build": "make build",
         "quickbuild": "make quickbuild",
