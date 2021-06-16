@@ -25,7 +25,7 @@ node_modules: package.json package-lock.json
 build/client: client.rkt | build/runtime build/examples
 	@echo "Compiling the client..."
 	racks $(RACKS_FLAGS) $(RACKS_ARGS) $(RACKS_APP_FLAGS) -d build/client --target webpack client.rkt
-	npx ./build/client/node_modules/.bin/webpack --config ./build/client/webpack.config.js --entry ./build/client/modules/client.rkt.js --output-path ./build/client/dist
+	./build/client/node_modules/.bin/webpack --config ./build/client/webpack.config.js --entry ./build/client/modules/client.rkt.js --output-path ./build/client/dist
 
 build/runtime: stub.rkt
 	@echo "Compiling the runtime..."
