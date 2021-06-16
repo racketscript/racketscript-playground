@@ -1,10 +1,11 @@
 Racketscript Playground
 =======================
 
-Playground
-for [RacketScript](https://github.com/vishesh/racketscript).  Visit
-http://rapture.twistedplane.com:8080 to try. Both server-side and
-client-side code is written in RacketScript.
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](COPYING.md)
+[![Try Online](https://img.shields.io/badge/try_it-online!-ff9900.svg)](http://161.35.54.145:8080/)
+
+Playground for [RacketScript](https://github.com/vishesh/racketscript). 
+Both server-side and client-side code is written in RacketScript. 
 
 ## Instructions
 
