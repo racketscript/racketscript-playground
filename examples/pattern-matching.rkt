@@ -25,15 +25,15 @@
     [(? number? val) (number->string val)]))
 
 (define html
-  (sexp->html `(html
-                (head
-                 (body
-                  (div ([width "100%"]
-                        [align "left"])
-                       (h1 "Hello world")
-                       ,@(map (λ (n)
-                               `(p ,(sqr n)))
-                             (range 10))))))))
+  (sexp->html `(div ([width "100%"]
+                     [align "left"])
+                    (h1 "Hello world")
+                    ,@(map (λ (n)
+                             `(p ,(sqr n)))
+                           (range 10)))))
 
 (displayln html)
-($$ document.write html)
+
+(define newbody ($$ document.createElement "body"))
+($/:= ($ newbody 'innerHTML) html)
+($/:= ($ document 'body) newbody)

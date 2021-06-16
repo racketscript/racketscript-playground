@@ -1,1 +1,1 @@
-../build/client/dist/compiled.js
+../build/client/dist/main.js
