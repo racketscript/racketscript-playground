@@ -11,10 +11,14 @@
 (define child-process ($/require "child_process"))
 (define spawn ($ child-process 'spawn))
 
+(define process #js*.global.process)
 (define console #js*.global.console)
 
 ;;-----------------------------------------------------------------------------
-(define PORT 8080)
+
+(define PORT (if ($/binop !== #js.process.env.PORT $/undefined)
+                 #js.process.env.PORT
+                 8080))
 
 ;;-----------------------------------------------------------------------------
 ;; Handlers

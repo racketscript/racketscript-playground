@@ -2,6 +2,9 @@
 RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
 RACKS_APP_FLAGS = --skip-arity-checks
 RACKS_EXAMPLE_FLAGS = --skip-arity-checks
+# DOCKER_BUILD_DEBUG_FLAGS= --progress plain --no-cache
+
+### Run playground
 
 run: build
 	node ./build/server/modules/app.rkt.js
@@ -10,6 +13,19 @@ run-forever: build
 
 quickrun: quickbuild
 	node ./build/server/modules/app.rkt.js
+
+### Docker
+
+docker-build:
+	docker build $(DOCKER_BUILD_DEBUG_FLAGS) -t vishesh/racketscript-playground .
+
+docker-run:
+	docker run -dp 8080:80 -e PORT=80 -t vishesh/racketscript-playground
+
+docker-push:
+	docker push vishesh/racketscript-playground:latest
+
+#### Build
 
 quickbuild: RACKS_ARGS = -n
 quickbuild: build
@@ -39,4 +55,3 @@ examples/%.rkt.js: examples/%.rkt
 
 clean:
 	rm -rf build/ examples/*.rkt.js
-

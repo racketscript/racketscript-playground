@@ -6,8 +6,6 @@ for [RacketScript](https://github.com/vishesh/racketscript).  Visit
 http://rapture.twistedplane.com:8080 to try. Both server-side and
 client-side code is written in RacketScript.
 
-## Instructions
-
 Playground uses Github Gist to save and load files. The name of Gist
 file must be `source.rkt`.
 
@@ -21,7 +19,26 @@ file must be `source.rkt`.
 component. Search and Replace shortcuts
 are [here](https://codemirror.net/demo/search.html).
 
-## Usage
+## Build and Deploy
+
+### With Docker (for deployment)
+
+Easiest way is to pull the latest image from Docker registry
+([vishesh/racket-script-playground](https://hub.docker.com/r/vishesh/racketscript-playground)).
+
+```bash
+# Pull docker image
+docker pull vishesh/racketscript-playground
+
+# Run playground webserver on port 8080
+docker run -dp 8080:8080 -t vishesh/racketscript-playground
+```
+
+You can also build image yourself using `make docker-build`, followed by `make
+docker-run` to start the playground web server. By default, `make docker-run`
+binds webserver to port 8080.
+
+### Without Docker (for development)
 
 After installing Racket, NodeJS, and RacketScript, execute following
 commands to run the playground:
