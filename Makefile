@@ -38,7 +38,7 @@ build/server: app.rkt | node_modules
 node_modules: package.json package-lock.json
 	npm install && touch node_modules
 
-build/client: client.rkt | build/runtime build/examples
+build/client: client.rkt | build/runtime
 	@echo "Compiling the client..."
 	racks $(RACKS_FLAGS) $(RACKS_ARGS) $(RACKS_APP_FLAGS) -d build/client --target webpack client.rkt
 	./build/client/node_modules/.bin/webpack --config ./build/client/webpack.config.js --entry ./build/client/modules/client.rkt.js --output-path ./build/client/dist
