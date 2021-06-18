@@ -1,4 +1,8 @@
 #lang racket
+
+;; NES Archery, by Jake Lawrence
+;; https://github.com/jakelawrence24/Revamped-NES-Archery
+
 (require racketscript/htdp/image
          racketscript/htdp/universe)
 
