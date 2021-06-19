@@ -5,6 +5,8 @@ on:
     - cron: '27 19 * * *'
   push:
     branches: [ master ]
+    tags:
+     - 'latest'
   pull_request:
     branches: [ master ]
 
