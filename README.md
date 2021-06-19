@@ -32,7 +32,7 @@ Easiest way is to pull the latest image from Docker registry
 docker pull vishesh/racketscript-playground
 
 # Run playground webserver on port 8080
-docker run -dp 8080:8080 -t vishesh/racketscript-playground
+docker run -dp 8080:80 -t vishesh/racketscript-playground
 ```
 
 You can also build image yourself using `make docker-build`, followed by `make
