@@ -20,7 +20,7 @@ docker-build:
 	docker build $(DOCKER_BUILD_DEBUG_FLAGS) -t vishesh/racketscript-playground .
 
 docker-run:
-	docker run -dp 8080:80 -e PORT=80 -t vishesh/racketscript-playground
+	docker run -dp 80:8080 -t vishesh/racketscript-playground
 
 docker-push:
 	docker push vishesh/racketscript-playground:latest
