@@ -32,6 +32,7 @@
 
 (define compiling?           #f)
 (define last-compile-time    (#js*.Date.now))
+(define logged-in?           #f)
 
 (define-syntax := (make-rename-transformer #'$/:=))
 (define run-frame-init-handler (λ ()
@@ -67,6 +68,10 @@
       (click (λ (e)
                (#js.e.preventDefault)
                (compile #t))))
+#;  ($> (jQuery #js"#btn-login")
+      (click (λ (e)
+               (#js.e.preventDefault)
+               (login))))
   ($> (jQuery #js"#btn-save")
       (click (λ (e)
                (#js.e.preventDefault)
@@ -208,21 +213,140 @@
                           #js.xhr.responseJSON.message)))))
 
 (define (save)
+  ;; this data will get forwarded to github
+  ;; see: https://docs.github.com/en/rest/reference/gists#create-a-gist--parameters
   (define data
     {$/obj
-     [public      #t]
-     [files
+     [public      #f]
+     [description #js"RacketScript Playground Program"]
+#;     [files
       (assoc->object
        `([,*gist-source-file* ,{$/obj
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
-                                    [content (#js.cm-editor-jsout.getValue)]}]))]})
-  ($> (#js.jQuery.post #js"https://api.github.com/gists" (#js*.JSON.stringify data))
+                                    [content (#js.cm-editor-jsout.getValue)]}]))]
+#;     [rkt (#js.cm-editor-racket.getValue)]
+  #;   [js  (#js.cm-editor-jsout.getValue)]
+     [files
+      {$/obj
+       [source.rkt {$/obj
+                    [content (#js.cm-editor-racket.getValue)]}]
+       [compiled.js {$/obj
+                     [content (#js.cm-editor-jsout.getValue)]}]}]})
+  (#js*.console.log #js"sending to server ...")
+  (#js*.console.log #js.data)
+  (define settings
+    {$/obj
+     [url #js"/save"]
+     [data data #;(#js*.JSON.stringify data)]
+     ;[data data]
+#;     [headers
+      {$/obj
+       [Accept #js"application/vnd.github.v3+json"]
+       [Authorization #js"token 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"]}]})
+  ($> (#js.jQuery.post #js"/save" data) #;(#js.jQuery.post settings)
+      #;(#js.jQuery.post #js"https://api.github.com/gists" (#js*.JSON.stringify data))
       (done (λ (data)
-              (define id #js.data.id)
+              (#js*.console.log data)
+              (define id #js.data)
               (:= #js.window.location.href ($/binop + #js"#gist/" id))))
       (fail (λ (e)
+              (#js*.console.log #js.e)
               (show-error "Error saving as Gist"
+                          #js.e.responseJSON.message)))))
+
+#;(define (save)
+#;  (define data
+    {$/obj
+     [public      #t]
+#;     [files
+      (assoc->object
+       `([,*gist-source-file* ,{$/obj
+                                [content (#js.cm-editor-racket.getValue)]}]
+         [,*gist-javascript-file* ,{$/obj
+                                    [content (#js.cm-editor-jsout.getValue)]}]))]
+     [files
+      {$/obj
+       [source.rkt {$/obj
+                    [content (#js.cm-editor-racket.getValue)]}]
+       [compiled.js {$/obj
+                     [content (#js.cm-editor-jsout.getValue)]}]}]})
+  (define settings
+    {$/obj
+     [url #js"/save"]
+;     [data (#js*.JSON.stringify data)]
+     ;[data data]
+ #;    [headers
+      {$/obj
+       [Accept #js"application/vnd.github.v3+json"]
+       [Authorization #js"token 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"]}]})
+  ($> (#js.jQuery.post settings)
+      #;(#js.jQuery.post #js"https://api.github.com/gists" (#js*.JSON.stringify data))
+      (done (λ (data)
+              (show-error "saved"
+                          #js.data.responseJSON.message)
+              #;(define id #js.data.id)
+              #;(:= #js.window.location.href ($/binop + #js"#gist/" id))))
+      (fail (λ (e)
+              (#js*.console.log #js.e)
+              (show-error "Error saving as Gist"
+                          #js.e.responseJSON.message)))))
+
+#;(define (login)
+  (show-error "Logging in" "Github login coming soon!"))
+(define (login)
+  #;(define (compile execute?)
+  (when (or (not compiling?) (> (- (#js*.Date.now) last-compile-time) 5000))
+    (:= compiling? #t)
+    (#js*.setTimeout (λ ()
+                       (:= compiling? #f))
+                     5000)
+    (#js.cm-editor-console.setValue #js"Console Log:\n")
+    (#js.cm-editor-jsout.setValue #js"Compiling ...")
+    ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
+        (done (λ (data)
+                (set-javascript-code data)
+                (when execute?
+                  (run))))
+        (fail (λ (xhr status err)
+                (#js.cm-editor-console.setValue
+                 ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
+                (#js.cm-editor-jsout.setValue #js"")))
+        (always (λ ()
+                  (:= compiling? #f))))))
+  (#js.jQuery.get #js"/login")
+#;(define data
+    {$/obj
+     [client-id #js"079bd6bc167ef3ba0753"]})
+#;(define settings
+    {$/obj
+     [url #js"https://github.com/login/oauth/authorize"]
+     [data (#js*.JSON.stringify data)]
+#;     [headers
+      {$/obj
+       [Authorization #js"token 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"]}]})
+#;  ($> (#js.jQuery.get settings)
+      (done (λ (data)
+              (#js*.console.log #js.data)
+              #;(show-error "logging in"
+                          #js.data.responseJSON.message)))
+      (fail (λ (e)
+              (show-error "failed logging in"
+                          #js.e.responseJSON.message)))))
+#;(define (login)
+  (define settings
+    {$/obj
+     [url #js"https://api.github.com/user"]
+     [headers
+      {$/obj
+       [Authorization #js"token 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"]}]})
+  ($> (#js.jQuery.get settings)
+      (done (λ (data)
+              (#js*.console.log #js.data)
+              #;(show-error "logging in"
+                          #js.data.responseJSON.message)))
+      (fail (λ (e)
+              (show-error "failed logging in"
                           #js.e.responseJSON.message)))))
 
 ;;-------------------------------------------------------------------------------
