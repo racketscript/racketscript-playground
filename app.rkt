@@ -12,6 +12,7 @@
 (define https ($/require "https"))
 (define url ($/require "url"))
 (define session ($/require "express-session"))
+(define dotenv ($/require "dotenv"))
 
 (define spawn ($ child-process 'spawn))
 
@@ -24,16 +25,15 @@
                  #js.process.env.PORT
                  8080))
 
-;; hash mapping user ids to auth tokens
-(define USERS (make-hash))
+(#js.dotenv.config) ; load env vars from .env file
 
-;; TODO: this is temporary. use the above hash instead
-(define ACCESS-TOKEN "")
+;; (define PLAYGROUND-GH-CLIENT-ID #js"079bd6bc167ef3ba0753")
+;; (define PLAYGROUND-GH-SECRET #js"d0beada041f11935c6e27acd3e34566b6548b72a")
+(define PLAYGROUND-GH-CLIENT-ID #js.process.env.PLAYGROUND_GITHUB_CLIENT_ID)
+(define PLAYGROUND-GH-SECRET #js.process.env.PLAYGROUND_GITHUB_SECRET)
+
 ;;-----------------------------------------------------------------------------
 ;; Handlers
-
-(define PLAYGROUND-GH-CLIENT-ID #js"079bd6bc167ef3ba0753")
-(define PLAYGROUND-GH-SECRET #js"d0beada041f11935c6e27acd3e34566b6548b72a")
 
 (define (has-code? url) (#js.url.includes #js"?code="))
 
@@ -287,7 +287,7 @@
           (#js.req.session.save (λ (e) (#js.console.log #js"access_token saved")))
           (#js.console.log #js.req.session)
           (#js.res.send #js"<script>window.close();</script>")
-          (set! ACCESS-TOKEN tok))))))
+#;          (set! ACCESS-TOKEN tok))))))
   (#js.gh-req.on #js"error"
    (λ (e)
      (#js.console.error e)))
