@@ -74,8 +74,39 @@
           (define gh-data (#js*.Buffer.concat gh-datas))
           ;; TODO: directly convert data to JSON?
           (define res-data (#js*.JSON.parse (#js.gh-data.toString)))
-          (#js.console.log ($/binop + #js"save successful, gist id: " #js.res-data.id))
-          (#js.res.send #js.res-data.id))))))
+          (define gist-id #js.res-data.id)
+          (#js.console.log ($/binop + #js"save successful, gist id: " gist-id))
+
+          ;; now make second api call to patch the description,
+          ;; to include a direct link to open gist in playground app
+          (define patch-data
+            (#js*.JSON.stringify
+             {$/obj
+              [description
+               ($/binop +
+                #js"RacketScript Playground Program; view at: http://dev.racketscript.org:8080/#gist/"
+                gist-id)]}))
+
+          (define patch-options
+            {$/obj
+             [hostname #js"api.github.com"]
+             [path ($/binop + #js"/gists/" gist-id)]
+             [method #js"PATCH"]
+             [headers
+              {$/obj
+               [Accept #js"application/vnd.github.v3+json"]
+               [Authorization ($/binop + #js"token " #js.req.session.access_token)]
+               ;; User agent required:
+               ;; (see: https://docs.github.com/en/rest/overview/resources-in-the-rest-api#user-agent-required)
+               [User-Agent #js"RacketScript Playground"]}]})
+
+          (define patch-req (#js.https.request patch-options))
+          (#js.patch-req.on #js"error" (λ (e) (#js.console.error e)))
+          (#js.patch-req.write patch-data)
+          (#js.patch-req.end)
+
+          ;; finally, return gist-id to client
+          (#js.res.send gist-id))))))
   (#js.gh-req.on #js"error"
    (λ (e)
      (#js.console.error e)))
