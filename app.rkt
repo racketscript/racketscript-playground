@@ -27,8 +27,7 @@
 
 (#js.dotenv.config) ; load env vars from .env file
 
-;; (define PLAYGROUND-GH-CLIENT-ID #js"079bd6bc167ef3ba0753")
-;; (define PLAYGROUND-GH-SECRET #js"d0beada041f11935c6e27acd3e34566b6548b72a")
+;; these are loaded from a .env file
 (define PLAYGROUND-GH-CLIENT-ID #js.process.env.PLAYGROUND_GITHUB_CLIENT_ID)
 (define PLAYGROUND-GH-SECRET #js.process.env.PLAYGROUND_GITHUB_SECRET)
 
@@ -112,6 +111,7 @@
 ;; 4) server `handle-auth` fn called (see below)
 ;;    - extract "code" from gh request
 ;;    - send code, App client id, and app client secret to gh to get access token
+;;      (the server must do this request bc client will get blocked by browser CORS policy)
 ;;    - add access token to users's session in sessionStore (part of express-session)
 ;;      (TODO: dont use the default store)
 ;;      (session id was returned as param with gh request)
@@ -119,7 +119,7 @@
 ;;      and update buttons to reflect logged in status
 (define (handle-login req res)
   (#js.console.log ($/binop + #js"User wants to login, id: " #js.req.session.id))
-  ($/:= #js.req.session.access_token #js"") ; initialize so session gets saved
+  ($/:= #js.req.session.access_token #js"") ; initialize field so session gets saved to store
   (#js.console.log #js"Initiating GH Auth request ...")
   (define params
     ($/new
@@ -130,7 +130,6 @@
        [state #js.req.session.id]})))
   (define gh-auth-url
     ($/binop + #js"https://github.com/login/oauth/authorize?" params))
-;  (#js.console.log ($/binop + #js"https://github.com/login/oauth/authorize?" params))
   (#js.console.log ($/binop + #js"redirecting user to:\n" gh-auth-url))
   (#js.res.redirect 302 gh-auth-url))
   
