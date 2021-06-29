@@ -245,8 +245,6 @@
                     [content (#js.cm-editor-racket.getValue)]}]
        [compiled.js {$/obj
                      [content (#js.cm-editor-jsout.getValue)]}]}]})
-  (#js*.console.log #js"sending to server ...")
-  (#js*.console.log #js.data)
   ($> (#js.jQuery.post #js"/save" data)
       (done (λ (data)
               (#js*.console.log data)
