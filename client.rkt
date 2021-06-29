@@ -77,6 +77,7 @@
                #;(login))))
   ($> (jQuery #js"#btn-logout")
       (click (λ (e)
+               (logout)
                (do-logged-out)
                ;; ($> (jQuery #js"#btn-save") (hide))
                ;; ($> (jQuery #js"#btn-logout") (hide))
@@ -319,6 +320,9 @@
               (#js*.console.log #js.e)
               (show-error "Error saving as Gist"
                           #js.e.responseJSON.message)))))
+
+(define (logout)
+  (#js.jQuery.get #js"/logout"))
 
 #;(define (login)
   (show-error "Logging in" "Github login coming soon!"))

@@ -145,9 +145,16 @@
 
 (define (query-login req res)
   (#js.console.log (js-string (format "User ~a checking login status ..." (racket-string #js.req.session.id))))
-  (#js.console.log #js.req.session)
-  (#js.console.log #js.req.session.access_token)
   (#js.res.send ($/binop !== #js.req.session.access_token $/undefined)))
+
+(define (handle-logout req res)
+  (#js.console.log (js-string (format "User ~a wants to log out ..." (racket-string #js.req.session.id))))
+  (#js.req.session.destroy
+   (λ (err)
+     (if ($/binop !== err $/undefined)
+         ($> (#js.res.status 400)
+             (send #js"Unable to log out"))
+         (#js.res.send #js"Logout successful")))))
 
 ;; ##### gh login steps: #####
 ;; 1) user clicks login button:
@@ -390,7 +397,7 @@
   (#js.app.get #js"/auth" handle-auth)
   
   (#js.app.get #js"/login" handle-login)
-
+  (#js.app.get #js"/logout" handle-logout)
   (#js.app.get #js"/isloggedin" query-login)
   
   (#js.app.post #js"/compile" handle-compile)
