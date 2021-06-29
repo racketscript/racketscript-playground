@@ -84,11 +84,11 @@
   (#js.gh-req.end))
 
 (define (query-login req res)
-  (#js.console.log (js-string (format "User ~a checking login status ..." (racket-string #js.req.session.id))))
+  (#js.console.log (js-string (format "User ~a checking login status ..." (js-string->string #js.req.session.id))))
   (#js.res.send ($/binop !== #js.req.session.access_token $/undefined)))
 
 (define (handle-logout req res)
-  (#js.console.log (js-string (format "User ~a wants to log out ..." (racket-string #js.req.session.id))))
+  (#js.console.log (js-string (format "User ~a wants to log out ..." (js-string->string #js.req.session.id))))
   (#js.req.session.destroy
    (λ (err)
      (if ($/binop !== err $/undefined)

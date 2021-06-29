@@ -129,7 +129,7 @@
                  cm-editor-console (string-append (cond
                                          [(string? a) a]
                                          [(number? a) (number->string a)]
-                                         [else (racket-string (#js*.JSON.stringify a))])
+                                         [else (js-string->string (#js*.JSON.stringify a))])
                                        " "))
                 (append-to-editor! cm-editor-console #js"\n"))
               args)))
@@ -291,7 +291,7 @@
                     (split #js"/")))
   (reset-ui!)
   ; TODO: #js"str" does not work in a case branch
-  (case (racket-string ($ parts 0))
+  (case (js-string->string ($ parts 0))
     [("gist") (load-gist ($ parts 1))]
     [("example") (load-racket-example ($ parts 1))]
     [else
