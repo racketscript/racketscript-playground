@@ -32,7 +32,6 @@
 
 (define compiling?           #f)
 (define last-compile-time    (#js*.Date.now))
-(define logged-in?           #f)
 
 (define-syntax := (make-rename-transformer #'$/:=))
 (define run-frame-init-handler (λ ()
@@ -240,18 +239,16 @@
      [public      #f]
      [description #js"RacketScript Playground Program"]
      [files
-      {$/obj
-       [source.rkt {$/obj
-                    [content (#js.cm-editor-racket.getValue)]}]
-       [compiled.js {$/obj
-                     [content (#js.cm-editor-jsout.getValue)]}]}]})
+      (assoc->object
+       `([,*gist-source-file* ,{$/obj
+                                [content (#js.cm-editor-racket.getValue)]}]
+         [,*gist-javascript-file* ,{$/obj
+                                    [content (#js.cm-editor-jsout.getValue)]}]))]})
   ($> (#js.jQuery.post #js"/save" data)
       (done (λ (data)
-              (#js*.console.log data)
               (define id #js.data)
               (:= #js.window.location.href ($/binop + #js"#gist/" id))))
       (fail (λ (e)
-              (#js*.console.log #js.e)
               (show-error "Error saving as Gist"
                           #js.e.responseJSON.message)))))
 
