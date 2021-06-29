@@ -68,14 +68,42 @@
       (click (λ (e)
                (#js.e.preventDefault)
                (compile #t))))
-#;  ($> (jQuery #js"#btn-login")
+  #;($> (jQuery #js"#btn-login")
       (click (λ (e)
-               (#js.e.preventDefault)
-               (login))))
+               ($> (jQuery #js"#btn-save") (show))
+               ($> (jQuery #js"#btn-logout") (show))
+               ($> (jQuery #js"#btn-login") (hide))
+               #;(#js.e.preventDefault)
+               #;(login))))
+  ($> (jQuery #js"#btn-logout")
+      (click (λ (e)
+               (do-logged-out)
+               ;; ($> (jQuery #js"#btn-save") (hide))
+               ;; ($> (jQuery #js"#btn-logout") (hide))
+               ;; ($> (jQuery #js"#btn-login") (show))
+               #;(#js.e.preventDefault)
+               #;(logout))))
   ($> (jQuery #js"#btn-save")
       (click (λ (e)
                (#js.e.preventDefault)
                (save)))))
+
+(define (check-logged-in)
+  (#js.jQuery.get #js"/isloggedin"
+   (λ (isloggedin)
+     (if isloggedin
+         (do-logged-in)
+         (do-logged-out)))))
+
+(define (do-logged-in)
+  ($> (jQuery #js"#btn-save") (show))
+  ($> (jQuery #js"#btn-logout") (show))
+  ($> (jQuery #js"#btn-login") (hide)))
+
+(define (do-logged-out)
+  ($> (jQuery #js"#btn-save") (hide))
+  ($> (jQuery #js"#btn-logout") (hide))
+  ($> (jQuery #js"#btn-login") (show)))
 
 ;;-----------------------------------------------------------------------------
 ;; Editors
@@ -403,11 +431,16 @@
       (init-editors!)
       (init-split-layout!)
       (register-button-events!)
-      (load-racket-code)))
+      (load-racket-code)
+      (check-logged-in)))
   (#js*.window.addEventListener #js"hashchange" load-racket-code))
   (#js*.window.addEventListener #js"message"
     (λ (event)
       (when ($/binop === #js.event.data #js"run-iframe-init")
       (run-frame-init-handler event))))
+  (#js*.window.addEventListener #js"message"
+    (λ (event)
+      (when ($/binop === #js.event.data #js"logged-in")
+      (do-logged-in))))
 
 (main)
