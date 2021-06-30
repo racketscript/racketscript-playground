@@ -30,6 +30,7 @@
 ;; these are loaded from a .env file
 (define PLAYGROUND-GH-CLIENT-ID #js.process.env.PLAYGROUND_GITHUB_CLIENT_ID)
 (define PLAYGROUND-GH-SECRET #js.process.env.PLAYGROUND_GITHUB_SECRET)
+(define PLAYGROUND-URL #js.process.env.PLAYGROUND_URL)
 
 ;;-----------------------------------------------------------------------------
 ;; Handlers
@@ -83,9 +84,8 @@
             (#js*.JSON.stringify
              {$/obj
               [description
-               ($/binop +
-                #js"RacketScript Playground Program; view at: http://dev.racketscript.org:8080/#gist/"
-                gist-id)]}))
+               ($/+ #js"RacketScript Playground Program; view at: "
+                    PLAYGROUND-URL #js"/#gist/"  gist-id)]}))
 
           (define patch-options
             {$/obj
