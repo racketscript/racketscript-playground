@@ -36,9 +36,9 @@
 ;; Handlers
 
 (define (handle-save req res)
-  (#js.console.log ($/binop + #js"User wants to save: " #js.req.session.id))
+  (#js.console.log ($/+ #js"User " #js.req.session.id " wants to save ..."))
   (define tok #js.req.session.access_token)
-  (#js.console.log ($/binop + #js"with access_token: " tok))
+  (#js.console.log ($/+ #js"Creating gist with access_token: " tok))
   ;; TODO: how to forward data directly, without re-parsing/stringifying?
   (define data (#js*.JSON.stringify #js.req.body))
   (define options
@@ -65,7 +65,7 @@
     (#js.https.request
      options
      (λ (gh-res)
-       (#js.console.log ($/binop + #js"statusCode: " #js.gh-res.statusCode))
+       ;; (#js.console.log ($/binop + #js"save statusCode: " #js.gh-res.statusCode))
        (define gh-datas ($/array)) ; array of partial data buffers
        ;; TODO: is there a more high level way to get the data?
        ;; https://stackoverflow.com/questions/40537749/how-do-i-make-a-https-post-in-node-js-without-any-third-party-module
@@ -76,7 +76,7 @@
           ;; TODO: directly convert data to JSON?
           (define res-data (#js*.JSON.parse (#js.gh-data.toString)))
           (define gist-id #js.res-data.id)
-          (#js.console.log ($/binop + #js"save successful, gist id: " gist-id))
+          (#js.console.log ($/+ #js"Save successful, gist id: " gist-id))
 
           ;; now make second api call to patch the description,
           ;; to include a direct link to open gist in playground app
@@ -85,7 +85,7 @@
              {$/obj
               [description
                ($/+ #js"RacketScript Playground Program; view at: "
-                    PLAYGROUND-URL #js"/#gist/"  gist-id)]}))
+                    PLAYGROUND-URL #js"/#gist/" gist-id)]}))
 
           (define patch-options
             {$/obj
@@ -115,11 +115,11 @@
   (#js.gh-req.end))
 
 (define (query-login req res)
-  (#js.console.log (js-string (format "User ~a checking login status ..." (js-string->string #js.req.session.id))))
+  (#js.console.log ($/+ #js"User " #js.req.session.id #js" checking login status ..."))
   (#js.res.send ($/binop !== #js.req.session.access_token $/undefined)))
 
 (define (handle-logout req res)
-  (#js.console.log (js-string (format "User ~a wants to log out ..." (js-string->string #js.req.session.id))))
+  (#js.console.log ($/+ #js"User " #js.req.session.id " wants to log out ..."))
   (#js.req.session.destroy
    (λ (err)
      (if ($/binop !== err $/undefined)
@@ -149,9 +149,9 @@
 ;;    - send response to user to close login window,
 ;;      and update buttons to reflect logged in status
 (define (handle-login req res)
-  (#js.console.log ($/binop + #js"User wants to login, id: " #js.req.session.id))
+  (#js.console.log ($/+ #js"User " #js.req.session.id " wants to log in ..."))
   ($/:= #js.req.session.access_token #js"") ; initialize field so session gets saved to store
-  (#js.console.log #js"Initiating GH Auth request ...")
+  (#js.console.log #js"Requesting GH credentials from user ...")
   (define params
     ($/new
      (#js.url.URLSearchParams
@@ -161,7 +161,6 @@
        [state #js.req.session.id]})))
   (define gh-auth-url
     ($/binop + #js"https://github.com/login/oauth/authorize?" params))
-  (#js.console.log ($/binop + #js"redirecting user to:\n" gh-auth-url))
   (#js.res.redirect 302 gh-auth-url))
   
 ;; OAuth steps:
@@ -176,11 +175,10 @@
 ;; NOTE: the client_id comes from creating github oauth app;
 ;;       handler url "racketscript.org/auth" must be registered on this app page
 (define (handle-auth req res)
-  (#js.console.log #js"User logged in, attempting to get GH access token ...")
-  (#js.console.log ($/binop + #js"with user id: " #js.res.req.query.state))
-  (#js.console.log ($/binop + #js"and code: " #js.res.req.query.code))
-
+  (define uid #js.res.req.query.state)
   (define code #js.res.req.query.code)
+  (#js.console.log ($/+ #js"User " uid #js" entered GH login"))
+  (#js.console.log ($/+ #js"requesting GH access_token using code: " code))
 
   (define data
     (#js*.JSON.stringify
@@ -201,15 +199,14 @@
     (#js.https.request
      options
      (λ (gh-res)
-       (#js.console.log ($/binop + #js"access_token request statusCode: " #js.gh-res.statusCode))
+       ;; (#js.console.log ($/binop + #js"access_token request statusCode: " #js.gh-res.statusCode))
        (#js.gh-res.on #js"data"
         (λ (d) ;; data buffer
           (define params ($/new (#js.url.URLSearchParams (#js.d.toString #js"utf8"))))
           (define tok (#js.params.get #js"access_token"))
           (#js.console.log ($/binop + #js"Received GH access_token: " tok))
           ($/:= #js.req.session.access_token tok)
-          (#js.console.log ($/binop + #js"stored access_token: " #js.req.session.access_token))
-          (#js.console.log ($/binop + #js"for user id: " #js.req.session.id))
+          (#js.console.log ($/+ #js"Stored access_token for user " #js.req.session.id))
           ;; TODO: Is there a better way to do this?
           ;; send message to main window, to reflect logged in status; close gh login window
           (#js.res.send
