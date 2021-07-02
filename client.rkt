@@ -55,22 +55,26 @@
                      [gutterSize   *split-gutter-size*]}))
 
 (define (register-button-events!)
-  ($> (jQuery #js"#btn-compile")
-      (click (λ (e)
+  ($/:= ($> (#js.document.getElementById #js"btn-compile") onclick)
+        (λ (e)
                (#js.e.preventDefault)
-               (compile #f))))
-  ($> (jQuery #js"#btn-run")
-      (click (λ (e)
+               (compile #f)))
+  ($/:= ($> (#js.document.getElementById #js"btn-run") onclick)
+        (λ (e)
                (#js.e.preventDefault)
-               (run))))
-  ($> (jQuery #js"#btn-compile-run")
-      (click (λ (e)
+               (run)))
+  ($/:= ($> (#js.document.getElementById #js"btn-compile-run") onclick)
+        (λ (e)
                (#js.e.preventDefault)
-               (compile #t))))
-  ($> (jQuery #js"#btn-save")
-      (click (λ (e)
+               (compile #t)))
+  ($/:= ($> (#js.document.getElementById #js"btn-logout") onclick)
+        (λ (e)
+               (logout)
+               (do-logged-out)))
+  ($/:= ($> (#js.document.getElementById #js"btn-save") onclick)
+        (λ (e)
                (#js.e.preventDefault)
-               (save)))))
+               (save))))
 
 ;;-----------------------------------------------------------------------------
 ;; Editors
@@ -177,24 +181,67 @@
                      5000)
     (#js.cm-editor-console.setValue #js"Console Log:\n")
     (#js.cm-editor-jsout.setValue #js"Compiling ...")
-    ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
-        (done (λ (data)
+    ($> #;(#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
+        (#js*.fetch
+         #js"/compile"
+         {$/obj [method #js"POST"]
+                [headers {$/obj #;[Content-Type #js"application/x-www-form-urlencoded; charset=UTF-8"]
+                                [Content-Type #js"application/json"]}]
+                [body (#js*.JSON.stringify
+                       {$/obj [code (#js.cm-editor-racket.getValue)]})]})
+        (then (λ (response) (:= compiling? #f) (#js.response.text)))
+        (then (λ (data)
                 (set-javascript-code data)
                 (when execute?
                   (run))))
-        (fail (λ (xhr status err)
+        (catch (λ (err) #;(xhr status err)
                 (#js.cm-editor-console.setValue
-                 ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
+                 ($/binop + #js"Compilation error:\n" err))
                 (#js.cm-editor-jsout.setValue #js"")))
-        (always (λ ()
+        #;(always (λ ()
                   (:= compiling? #f))))))
 
 ;;-----------------------------------------------------------------------------
-;; Save and Load Gist
+;; Login, Save, and Load Gist
+
+(define (hide-element e)
+  ($/:= #js.e.style.display #js"none")
+  ;; TODO: not sure if these are needed, was trying to get modal working
+  #;($/:= #js.e.classList.remove #js"show")
+  #;($/:= #js.e.classList.add #js"hidden"))
+(define (show-element e)
+  ($/:= #js.e.style.display #js"block")
+  #;($/:= #js.e.classList.add #js"show")
+  #;($/:= #js.e.classList.remove #js"hidden"))
+
+(define (check-logged-in)
+  ;(#js.jQuery.get #js"/isloggedin"
+  ($> (#js*.fetch #js"/isloggedin")
+      (then (λ (response) (#js.response.json)))
+      (then (λ (isloggedin)
+     (if isloggedin
+         (do-logged-in)
+         (do-logged-out))))))
+
+(define (do-logged-in)
+  (show-element (#js.document.getElementById #js"btn-save"))
+  (show-element (#js.document.getElementById #js"btn-logout"))
+  (hide-element (#js.document.getElementById #js"btn-login")))
+
+(define (do-logged-out)
+  (hide-element (#js.document.getElementById #js"btn-save"))
+  (hide-element (#js.document.getElementById #js"btn-logout"))
+  (show-element (#js.document.getElementById #js"btn-login")))
+
+(define (logout)
+  (#js*.fetch #js"/logout")
+  #;(#js.jQuery.get #js"/logout"))
 
 (define (load-gist id)
-  ($> (#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
-      (done (λ (data)
+  ($> (#js*.fetch ($/binop + "https://api.github.com/gists/" id))
+      #;(#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
+      (then (λ (response) (#js.response.json)))
+      (then (λ (data)
               (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
@@ -203,9 +250,7 @@
                  (run)]
                 [else
                  (compile #t)])))
-      (fail (λ (xhr)
-              (show-error "Error load Gist"
-                          #js.xhr.responseJSON.message)))))
+      (catch (λ (xhr) (show-error "Error loading Gist" #js.xhr)))))
 
 (define (save)
   (define data
@@ -217,13 +262,15 @@
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
-  ($> (#js.jQuery.post #js"https://api.github.com/gists" (#js*.JSON.stringify data))
-      (done (λ (data)
-              (define id #js.data.id)
-              (:= #js.window.location.href ($/binop + #js"#gist/" id))))
-      (fail (λ (e)
-              (show-error "Error saving as Gist"
-                          #js.e.responseJSON.message)))))
+  ($> #;(#js.jQuery.post #js"/save" data)
+      (#js*.fetch
+       #js"/save"
+       {$/obj [method #js"POST"]
+              [headers {$/obj [Content-Type #js"application/json"]}]
+              [body (#js*.JSON.stringify data)]})
+      (then (λ (response) (#js.response.text)))
+      (then (λ (id) (:= #js.window.location.href ($/binop + #js"#gist/" id))))
+      (catch (λ (e) (show-error "Error saving as Gist" #js.e)))))
 
 ;;-------------------------------------------------------------------------------
 
@@ -234,6 +281,14 @@
       (text (js-string title)))
   ($> (#js.jQuery #js"#error-modal p")
       (text (js-string msg))))
+;; modal without jquery
+;; TODO: doesnt work
+#;(define (show-error title msg)
+  (show-element (#js.document.querySelector #js"#error-modal"))
+  ($/:= ($> (#js.document.querySelector #js"#error-modal .modal-title") textContent)
+        (js-string title))
+  ($/:= ($> (#js.document.querySelector #js"#error-modal p") textContent)
+        (js-string msg)))
 
 ;;-------------------------------------------------------------------------------
 
