@@ -17,7 +17,9 @@
     },
     "dependencies": {
         "express": "^4.17.1",
-        "body-parser": "*"
+        "express-session": "*",
+        "body-parser": "*",
+        "dotenv": "*"
     },
     "scripts": {
         "build": "make build",

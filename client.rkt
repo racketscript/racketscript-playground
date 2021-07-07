@@ -67,6 +67,10 @@
       (click (λ (e)
                (#js.e.preventDefault)
                (compile #t))))
+  ($> (jQuery #js"#btn-logout")
+      (click (λ (e)
+               (logout)
+               (do-logged-out))))
   ($> (jQuery #js"#btn-save")
       (click (λ (e)
                (#js.e.preventDefault)
@@ -125,7 +129,7 @@
                  cm-editor-console (string-append (cond
                                          [(string? a) a]
                                          [(number? a) (number->string a)]
-                                         [else (racket-string (#js*.JSON.stringify a))])
+                                         [else (js-string->string (#js*.JSON.stringify a))])
                                        " "))
                 (append-to-editor! cm-editor-console #js"\n"))
               args)))
@@ -190,7 +194,27 @@
                   (:= compiling? #f))))))
 
 ;;-----------------------------------------------------------------------------
-;; Save and Load Gist
+;; Login, Save, and Load Gist
+
+(define (check-logged-in)
+  (#js.jQuery.get #js"/isloggedin"
+   (λ (isloggedin)
+     (if isloggedin
+         (do-logged-in)
+         (do-logged-out)))))
+
+(define (do-logged-in)
+  ($> (jQuery #js"#btn-save") (show))
+  ($> (jQuery #js"#btn-logout") (show))
+  ($> (jQuery #js"#btn-login") (hide)))
+
+(define (do-logged-out)
+  ($> (jQuery #js"#btn-save") (hide))
+  ($> (jQuery #js"#btn-logout") (hide))
+  ($> (jQuery #js"#btn-login") (show)))
+
+(define (logout)
+  (#js.jQuery.get #js"/logout"))
 
 (define (load-gist id)
   ($> (#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
@@ -208,18 +232,21 @@
                           #js.xhr.responseJSON.message)))))
 
 (define (save)
+  ;; this data will get forwarded to github
+  ;; see: https://docs.github.com/en/rest/reference/gists#create-a-gist--parameters
   (define data
     {$/obj
-     [public      #t]
+     [public      #f]
+     [description #js"RacketScript Playground Program"]
      [files
       (assoc->object
        `([,*gist-source-file* ,{$/obj
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
-  ($> (#js.jQuery.post #js"https://api.github.com/gists" (#js*.JSON.stringify data))
+  ($> (#js.jQuery.post #js"/save" data)
       (done (λ (data)
-              (define id #js.data.id)
+              (define id #js.data)
               (:= #js.window.location.href ($/binop + #js"#gist/" id))))
       (fail (λ (e)
               (show-error "Error saving as Gist"
@@ -264,7 +291,7 @@
                     (split #js"/")))
   (reset-ui!)
   ; TODO: #js"str" does not work in a case branch
-  (case (racket-string ($ parts 0))
+  (case (js-string->string ($ parts 0))
     [("gist") (load-gist ($ parts 1))]
     [("example") (load-racket-example ($ parts 1))]
     [else
@@ -279,11 +306,16 @@
       (init-editors!)
       (init-split-layout!)
       (register-button-events!)
-      (load-racket-code)))
+      (load-racket-code)
+      (check-logged-in)))
   (#js*.window.addEventListener #js"hashchange" load-racket-code))
   (#js*.window.addEventListener #js"message"
     (λ (event)
       (when ($/binop === #js.event.data #js"run-iframe-init")
       (run-frame-init-handler event))))
+  (#js*.window.addEventListener #js"message"
+    (λ (event)
+      (when ($/binop === #js.event.data #js"logged-in")
+      (do-logged-in))))
 
 (main)
