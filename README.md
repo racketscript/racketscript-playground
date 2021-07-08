@@ -25,7 +25,7 @@ are [here](https://codemirror.net/demo/search.html).
 ### With Docker (for deployment)
 
 Easiest way is to pull the latest image from Docker registry
-([vishesh/racket-script-playground](https://hub.docker.com/r/vishesh/racketscript-playground)).
+([vishesh/racketscript-playground](https://hub.docker.com/r/vishesh/racketscript-playground)).
 
 ```bash
 # Pull docker image
