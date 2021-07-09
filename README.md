@@ -1,7 +1,7 @@
 Racketscript Playground
 =======================
 
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](COPYING.md)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docker](https://img.shields.io/docker/cloud/automated/vishesh/racketscript-playground)](https://hub.docker.com/r/vishesh/racketscript-playground)
 [![Try Online](https://img.shields.io/badge/try_it-online!-ff9900.svg)](http://play.racketscript.org)
 
