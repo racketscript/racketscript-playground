@@ -49,3 +49,9 @@ write
 
 ;; racket/private/list-predicate.rkt
 empty?
+
+;; vector
+vector-member
+
+;; string
+string-contains?
