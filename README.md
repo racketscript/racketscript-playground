@@ -2,10 +2,10 @@ Racketscript Playground
 =======================
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Docker](https://img.shields.io/docker/cloud/automated/vishesh/racketscript-playground)](https://hub.docker.com/r/vishesh/racketscript-playground)
+[![Docker](https://img.shields.io/docker/cloud/automated/vishesh/racketscript-playground)](https://hub.docker.com/r/racketscript/racketscript-playground)
 [![Try Online](https://img.shields.io/badge/try_it-online!-ff9900.svg)](http://play.racketscript.org)
 
-Playground for [RacketScript](https://github.com/vishesh/racketscript). 
+Playground for [RacketScript](https://github.com/racketscript/racketscript).
 Both server-side and client-side code is written in RacketScript. 
 
 Playground uses Github Gist to save and load files. The name of Gist
@@ -26,14 +26,14 @@ are [here](https://codemirror.net/demo/search.html).
 ### With Docker (for deployment)
 
 Easiest way is to pull the latest image from Docker registry
-([vishesh/racketscript-playground](https://hub.docker.com/r/vishesh/racketscript-playground)).
+([racketscript/racketscript-playground](https://hub.docker.com/r/racketscript/racketscript-playground)).
 
 ```bash
 # Pull docker image
-docker pull vishesh/racketscript-playground
+docker pull racketscript/racketscript-playground
 
 # Run playground webserver on port 8080
-docker run -dp 8080:8080 -t vishesh/racketscript-playground
+docker run -dp 8080:8080 -t racketscript/racketscript-playground
 ```
 
 You can also build image yourself using `make docker-build`, followed by `make
