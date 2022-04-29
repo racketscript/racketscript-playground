@@ -2,7 +2,7 @@
 RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
 RACKS_APP_FLAGS = --skip-arity-checks
 RACKS_EXAMPLE_FLAGS = --skip-arity-checks
-DOCKER_BUILD_DEBUG_FLAGS= --progress plain --no-cache
+DOCKER_BUILD_DEBUG_FLAGS = --progress plain --no-cache
 
 ### Run playground
 
