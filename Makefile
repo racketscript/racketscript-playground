@@ -2,7 +2,7 @@
 RACKS_FLAGS = --enable-self-tail --enable-flatten-if --js-beautify
 RACKS_APP_FLAGS = --skip-arity-checks
 RACKS_EXAMPLE_FLAGS = --skip-arity-checks
-# DOCKER_BUILD_DEBUG_FLAGS= --progress plain --no-cache
+DOCKER_BUILD_DEBUG_FLAGS = --progress plain --no-cache
 
 ### Run playground
 
@@ -17,13 +17,13 @@ quickrun: quickbuild
 ### Docker
 
 docker-build:
-	docker build $(DOCKER_BUILD_DEBUG_FLAGS) -t vishesh/racketscript-playground .
+	docker build $(DOCKER_BUILD_DEBUG_FLAGS) -t racketscript/racketscript-playground .
 
 docker-run:
-	docker run -dp 8080:80 -e PORT=80 -t vishesh/racketscript-playground
+	docker run -dp 8080:80 -e PORT=80 -t racketscript/racketscript-playground
 
 docker-push:
-	docker push vishesh/racketscript-playground:latest
+	docker push racketscript/racketscript-playground:latest
 
 #### Build
 
