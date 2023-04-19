@@ -54,27 +54,32 @@
                      [sizes        [$/array 75 25]]
                      [gutterSize   *split-gutter-size*]}))
 
+(define (get-element-by-id id)
+  (#js*.document.getElementById (js-string id)))
+
+(define (query-selector query)
+  (#js*.document.querySelector (js-string query)))
+
 (define (register-button-events!)
-  ($> (jQuery #js"#btn-compile")
-      (click (λ (e)
+  (define (add-button-onclick button-id func)
+    (define compile-btn (get-element-by-id button-id))
+    (#js.compile-btn.addEventListener #js"click" func))
+  (add-button-onclick "btn-compile" (λ (e)
                (#js.e.preventDefault)
-               (compile #f))))
-  ($> (jQuery #js"#btn-run")
-      (click (λ (e)
+               (compile #f)))
+  (add-button-onclick "btn-run" (λ (e)
                (#js.e.preventDefault)
-               (run))))
-  ($> (jQuery #js"#btn-compile-run")
-      (click (λ (e)
+               (run)))
+  (add-button-onclick "btn-compile-run" (λ (e)
                (#js.e.preventDefault)
-               (compile #t))))
-  ($> (jQuery #js"#btn-logout")
-      (click (λ (e)
+               (compile #t)))
+  (add-button-onclick "btn-logout" (λ (e)
                (logout)
-               (do-logged-out))))
-  ($> (jQuery #js"#btn-save")
-      (click (λ (e)
+               (do-logged-out)))
+  (add-button-onclick "btn-save" (λ (e)
                (#js.e.preventDefault)
-               (save)))))
+               (save)))
+  )
 
 ;;-----------------------------------------------------------------------------
 ;; Editors
@@ -181,40 +186,67 @@
                      5000)
     (#js.cm-editor-console.setValue #js"Console Log:\n")
     (#js.cm-editor-jsout.setValue #js"Compiling ...")
-    ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
-        (done (λ (data)
+
+    ;;; ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
+    ;;;       (done (λ (data)
+    ;;;               (set-javascript-code data)
+    ;;;               (when execute?
+    ;;;                 (run))))
+    ;;;       (fail (λ (xhr status err)
+    ;;;               (#js.cm-editor-console.setValue
+    ;;;               ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
+    ;;;               (#js.cm-editor-jsout.setValue #js"")))
+    ;;;       (always (λ ()
+    ;;;                 (:= compiling? #f))))
+    ;;; TODO: Error handling for this POST req
+    ($> (#js*.fetch #js"/compile" {$/obj 
+                [method "POST"]
+                [headers {$/obj
+                  [Content-type (js-string "application/json; charset=utf-8")]}]
+                [body 
+                  (#js*.JSON.stringify {$/obj [code (#js.cm-editor-racket.getValue)]})]
+        })
+        (then (λ (response)
+                (if #js.response.ok
+                  (#js.response.json)
+                  (λ ()
+                    ((#js.cm-editor-console.setValue
+                    ($/binop + #js"Compilation error:\n" #js"failed to compile"))
+                    (#js.cm-editor-jsout.setValue #js""))
+                  )
+                  ;;; (#js*.console.log #js"sadface")
+                  )))
+        (then (λ (data)
                 (set-javascript-code data)
                 (when execute?
                   (run))))
-        (fail (λ (xhr status err)
-                (#js.cm-editor-console.setValue
-                 ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
-                (#js.cm-editor-jsout.setValue #js"")))
-        (always (λ ()
-                  (:= compiling? #f))))))
+        (then (λ ()
+                  (:= compiling? #f))))
+    ))
 
 ;;-----------------------------------------------------------------------------
 ;; Login, Save, and Load Gist
 
 (define (check-logged-in)
-  (#js.jQuery.get #js"/isloggedin"
-   (λ (isloggedin)
-     (if isloggedin
-         (do-logged-in)
-         (do-logged-out)))))
+  ($> (#js*.fetch #js"/isloggedin")
+      (then (λ (response) (#js.response.json)))
+      (then (λ (isloggedin)
+            (if isloggedin
+                (do-logged-in)
+                (do-logged-out))))))
 
 (define (do-logged-in)
-  ($> (jQuery #js"#btn-save") (show))
-  ($> (jQuery #js"#btn-logout") (show))
-  ($> (jQuery #js"#btn-login") (hide)))
+  ($> (get-element-by-id "btn-save") (show))
+  ($> (get-element-by-id "btn-logout") (show))
+  ($> (get-element-by-id "btn-login") (hide)))
 
 (define (do-logged-out)
-  ($> (jQuery #js"#btn-save") (hide))
-  ($> (jQuery #js"#btn-logout") (hide))
-  ($> (jQuery #js"#btn-login") (show)))
+  ($> (get-element-by-id "btn-save") (hide))
+  ($> (get-element-by-id "btn-logout") (hide))
+  ($> (get-element-by-id "btn-login") (show)))
 
 (define (logout)
-  (#js.jQuery.get #js"/logout"))
+  (#js*.fetch #js"/logout"))
 
 (define (load-gist id)
   ($> (#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
@@ -255,12 +287,20 @@
 ;;-------------------------------------------------------------------------------
 
 (define (show-error title msg)
-  ($> (#js.jQuery #js"#error-modal")
+  ($> (query-selector "#error-modal")
                   (modal #js"show"))
-  ($> (#js.jQuery #js"#error-modal .modal-title")
+  ($> (query-selector "#error-modal .modal-title")
       (text (js-string title)))
-  ($> (#js.jQuery #js"#error-modal p")
+  ($> (query-selector "#error-modal p")
       (text (js-string msg))))
+
+;;; (define (show-error title msg)
+;;;   ($> (#js.jQuery #js"#error-modal")
+;;;                   (modal #js"show"))
+;;;   ($> (#js.jQuery #js"#error-modal .modal-title")
+;;;       (text (js-string title)))
+;;;   ($> (#js.jQuery #js"#error-modal p")
+;;;       (text (js-string msg))))
 
 ;;-------------------------------------------------------------------------------
 

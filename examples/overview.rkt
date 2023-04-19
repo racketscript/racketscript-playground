@@ -17,9 +17,8 @@
 ;; Racket environment. A dot `.` in identifier would split id and do a
 ;; JS object ref. Eg. `#js*.window.document` would translate to
 ;; `window.document`"
-(define jquery #js*.$)
 
-;; Here's a toy function to convert xexpr to DOM element using jQuery.
+;; Here's a toy function to convert xexpr to DOM element using document.querySelector.
 (define (sexp->jq sexp)
   (define (add-attrs jq attr-names attr-vals)
     (foldl (λ (name val jq)
@@ -38,7 +37,7 @@
            (app sexp->jq childs) ...)
      (~> (format "<~a></~a>" tag-name tag-name)
          ($/str _)
-         (jquery _)
+         (#js*.document.querySelector _)
          (add-attrs _ attr-names attr-vals)
          (add-childs _ childs))]
     [(list tag-name childs ...)
@@ -49,11 +48,10 @@
 
 ;; $> is exported by racketscript/interop to make chaining more
 ;; convenient.
-($> (jquery document)
-    (ready
-     (λ _
+($> (#js.document.addEventListener #js"DOMContentLoaded" 
+    (λ _
        (displayln "DOM loaded!")
-       ($> (jquery #js"body")
+       ($> (#js*.document.querySelector #js"body")
            (append (sexp->jq
                     `(div
                       (h1 ([align "center"]) "Hello World!")
@@ -67,9 +65,10 @@
                                "Playground on Github"))
                         (li (a ([href "http://www.racket-lang.org/"]
                                 [target "_blank"])
-                               "Racket Programming Language"))))))))))
-    (on #js"click"
-        (λ (e)
+                               "Racket Programming Language")))))))))))
+
+($> (#js.document.addEventListener #js"click" 
+    (λ (e)
           (displayln (list "clicked at: " #js.e.pageX #js.e.pageY)))))
 
 
