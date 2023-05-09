@@ -208,21 +208,21 @@
         })
         (then (λ (response)
                 (if #js.response.ok
-                  (#js.response.json)
+                  (#js.response.text)
                   (λ ()
                     ((#js.cm-editor-console.setValue
                     ($/binop + #js"Compilation error:\n" #js"failed to compile"))
                     (#js.cm-editor-jsout.setValue #js""))
                   )
-                  ;;; (#js*.console.log #js"sadface")
-                  )))
+                  )
+                  ))
         (then (λ (data)
                 (set-javascript-code data)
                 (when execute?
                   (run))))
         (then (λ ()
-                  (:= compiling? #f))))
-    ))
+                  (:= compiling? #f)))
+      )))
 
 ;;-----------------------------------------------------------------------------
 ;; Login, Save, and Load Gist
@@ -235,15 +235,33 @@
                 (do-logged-in)
                 (do-logged-out))))))
 
+(define (hide-button btn)
+  (#js.btn.classList.remove #js"d-none")
+  )
+
+(define (show-button btn)
+  (#js.btn.classList.add #js"d-none")
+  )
+
 (define (do-logged-in)
-  ($> (get-element-by-id "btn-save") (show))
-  ($> (get-element-by-id "btn-logout") (show))
-  ($> (get-element-by-id "btn-login") (hide)))
+  ($> (jQuery #js"#btn-save") (show))
+  ($> (jQuery #js"#btn-logout") (show))
+  ($> (jQuery #js"#btn-login") (hide)))
+
+;;; (define (do-logged-in)
+;;;   (show-button (get-element-by-id "btn-save"))
+;;;   (show-button (get-element-by-id "btn-logout"))
+;;;   (hide-button (get-element-by-id "btn-login")))
 
 (define (do-logged-out)
-  ($> (get-element-by-id "btn-save") (hide))
-  ($> (get-element-by-id "btn-logout") (hide))
-  ($> (get-element-by-id "btn-login") (show)))
+  ($> (jQuery #js"#btn-save") (hide))
+  ($> (jQuery #js"#btn-logout") (hide))
+  ($> (jQuery #js"#btn-login") (show)))
+
+;;; (define (do-logged-out)
+;;;   (hide-button (get-element-by-id "btn-save"))
+;;;   (hide-button (get-element-by-id "btn-logout"))
+;;;   (show-button (get-element-by-id "btn-login")))
 
 (define (logout)
   (#js*.fetch #js"/logout"))
@@ -286,21 +304,21 @@
 
 ;;-------------------------------------------------------------------------------
 
-(define (show-error title msg)
-  ($> (query-selector "#error-modal")
-                  (modal #js"show"))
-  ($> (query-selector "#error-modal .modal-title")
-      (text (js-string title)))
-  ($> (query-selector "#error-modal p")
-      (text (js-string msg))))
-
 ;;; (define (show-error title msg)
-;;;   ($> (#js.jQuery #js"#error-modal")
+;;;   ($> (query-selector "#error-modal")
 ;;;                   (modal #js"show"))
-;;;   ($> (#js.jQuery #js"#error-modal .modal-title")
+;;;   ($> (query-selector "#error-modal .modal-title")
 ;;;       (text (js-string title)))
-;;;   ($> (#js.jQuery #js"#error-modal p")
+;;;   ($> (query-selector "#error-modal p")
 ;;;       (text (js-string msg))))
+
+(define (show-error title msg)
+  ($> (#js.jQuery #js"#error-modal")
+                  (modal #js"show"))
+  ($> (#js.jQuery #js"#error-modal .modal-title")
+      (text (js-string title)))
+  ($> (#js.jQuery #js"#error-modal p")
+      (text (js-string msg))))
 
 ;;-------------------------------------------------------------------------------
 
