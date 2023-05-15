@@ -3,24 +3,20 @@
 (require racketscript/interop racketscript/browser)
 
 (define (sexp->html sexp)
-  (define (compile-attrs attr-names attr-vals)
-    (foldl (λ (name val acc)
-             (format "~a ~a='~a\'" acc name val))
-           ""
-           attr-names
-           attr-vals))
   (match sexp
-    [(list tag-name (list [list attr-name attr-val] ...) body ...)
-     (format "<~a~a>~a</~a>"
-             tag-name
-             (compile-attrs attr-name attr-val)
-             (foldl (λ (b acc)
-                      (string-append acc (sexp->html b)))
-                    ""
-                    body)
-             tag-name)]
-    [(list tag-name body ...)
-     (sexp->html `(,tag-name () ,@body))]
+    [(list tag-name (list [list attr-name attr-val] ...) children ...)
+     (define node
+       ($$ document.createElement (symbol->string tag-name)))
+     (for-each (lambda (name val)
+                 ($$ node.setAttribute name val))
+               attr-name
+               attr-val)
+     (for-each (lambda (child)
+                 ($$ node.append child))
+               (map sexp->html children))
+     node]
+    [(list tag-name children ...)
+     (sexp->html `(,tag-name () ,@children))]
     [(? string? val) val]
     [(? number? val) (number->string val)]))
 
@@ -32,8 +28,5 @@
                              `(p ,(sqr n)))
                            (range 10)))))
 
-(displayln html)
-
-(define newbody ($$ document.createElement "body"))
-($/:= ($ newbody 'innerHTML) html)
-($/:= ($ document 'body) newbody)
+(define body ($$ document.querySelector "body"))
+($$ body.append html)
