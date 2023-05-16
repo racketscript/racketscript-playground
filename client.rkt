@@ -311,21 +311,27 @@
 
 ;;-------------------------------------------------------------------------------
 
-;;; (define (show-error title msg)
-;;;   ($> (query-selector "#error-modal")
-;;;                   (modal #js"show"))
-;;;   ($> (query-selector "#error-modal .modal-title")
-;;;       (text (js-string title)))
-;;;   ($> (query-selector "#error-modal p")
-;;;       (text (js-string msg))))
+(define (get-modal id)
+  ($/new (#js*.bootstrap.Modal (js-string id)))
+  )
 
 (define (show-error title msg)
-  ($> (#js.jQuery #js"#error-modal")
-                  (modal #js"show"))
-  ($> (#js.jQuery #js"#error-modal .modal-title")
-      (text (js-string title)))
-  ($> (#js.jQuery #js"#error-modal p")
-      (text (js-string msg))))
+  (#js*.console.log (get-modal "#error-modal"))
+  ($> (get-modal "#error-modal")
+                  (show))
+  ; ($> (query-selector "#error-modal .modal-title")
+  ;     (text (js-string title)))
+  ; ($> (query-selector "#error-modal p")
+  ;     (text (js-string msg)))
+      )
+
+; (define (show-error title msg)
+;   ($> (#js.jQuery #js"#error-modal")
+;                   (modal #js"show"))
+;   ($> (#js.jQuery #js"#error-modal .modal-title")
+;       (text (js-string title)))
+;   ($> (#js.jQuery #js"#error-modal p")
+;       (text (js-string msg))))
 
 ;;-------------------------------------------------------------------------------
 
