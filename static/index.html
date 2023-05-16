@@ -55,42 +55,43 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-default navbar-fixed-top navbar-expand-sm">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <div class="navbar-header">
-        <a href="#" class="navbar-brand">RacketScript Playground</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-main" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-      </div>
-      <div class="navbar-collapse collapse d-flex" id="navbar-main">
-	<ul class="nav navbar-nav float-start">
-	  <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Examples</a>
-	    <ul class="dropdown-menu" id="example-menu">
-	      <li><a href="#example/colored-carpet">Colored Carpet</a></li>
-	      <li><a href="#example/blank">Blank</a></li>
-	      <li><a href="#example/overview">Overview</a></li>
-	      <li><a href="#example/factorial">Factorial</a></li>
-	      <li><a href="#example/quicksort">Quicksort</a></li>
-	      <li><a href="#example/pattern-matching">Pattern Matching</a></li>
-	      <li><a href="#example/falling-sky">Falling Sky</a></li>
-	      <li><a href="#example/flappy-birds">Flappy Birds</a></li>
-	      <li><a href="#example/2048-game">2048 Game</a></li>
-	      <li><a href="#example/tetris">Tetris</a></li>
-	      <li><a href="#example/archery">Archery</a></li>
-	      <li><a href="#example/wordle">Wordle</a></li>
-	    </ul>
-	  </li>
-	  <li><a href="https://github.com/racketscript/racketscript" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> RacketScript on Github</a></li>
-	  <li><a href="https://github.com/racketscript/racketscript-playground" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> Playground on Github</a></li>
+      <a href="#" class="navbar-brand">RacketScript Playground</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-main" aria-controls="navbar-main" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse" id="navbar-main">
+	<ul class="nav navbar-nav me-auto mb-2 mb-lg-0">
+    
+	  <li class="nav-item dropdown" data-bs-theme="dark">
+  <a class="nav-link dropdown-toggle" href="#" id="example-dropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Examples</a>
+  <ul class="dropdown-menu" id="example-menu" aria-labelledby="example-dropdown">
+    <li><a class="dropdown-item" href="#example/colored-carpet">Colored Carpet</a></li>
+    <li><a class="dropdown-item" href="#example/blank">Blank</a></li>
+    <li><a class="dropdown-item" href="#example/overview">Overview</a></li>
+    <li><a class="dropdown-item" href="#example/factorial">Factorial</a></li>
+    <li><a class="dropdown-item" href="#example/quicksort">Quicksort</a></li>
+    <li><a class="dropdown-item" href="#example/pattern-matching">Pattern Matching</a></li>
+    <li><a class="dropdown-item" href="#example/falling-sky">Falling Sky</a></li>
+    <li><a class="dropdown-item" href="#example/flappy-birds">Flappy Birds</a></li>
+    <li><a class="dropdown-item" href="#example/2048-game">2048 Game</a></li>
+    <li><a class="dropdown-item" href="#example/tetris">Tetris</a></li>
+    <li><a class="dropdown-item" href="#example/archery">Archery</a></li>
+    <li><a class="dropdown-item" href="#example/wordle">Wordle</a></li>
+  </ul>
+</li>
+
+	  <li class="nav-item"><a href="https://github.com/racketscript/racketscript" class="nav-link" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> RacketScript on Github</a></li>
+	  <li class="nav-item"><a href="https://github.com/racketscript/racketscript-playground" class="nav-link" target="_blank"><span class="glyphicon glyphicon-github" aria-hidden="true"></span> Playground on Github</a></li>
         </ul>
         <ul class="nav navbar-nav float-end">
-          <li><a href="#" id="btn-save" class="d-none"><span class="glyphicon glyphicon-save" aria-hidden="true"></span> Save</a></li>
-          <li><a href="#" id="btn-login" class="d-none" target="popup" onclick="window.open('login','popup','width=600,height=800'); return false;"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Log in</a></li>
-          <li><a href="#" id="btn-logout" class="d-none"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Log out</a></li>
-          <li><a href="#" id="btn-compile"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Compile</a></li>
-          <li><a href="#" id="btn-run"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Run</a></li>
-          <li><a href="#" id="btn-compile-run"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Compile + Run</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="btn-save" class="d-none"><span class="glyphicon glyphicon-save" aria-hidden="true"></span> Save</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="btn-login" class="d-none" target="popup" onclick="window.open('login','popup','width=600,height=800'); return false;"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Log in</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="btn-logout" class="d-none"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Log out</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="btn-compile"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Compile</a></li>
+          <li class="nav-item"><a href="#" class="nav-link" id="btn-run"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Run</a></li>
+          <li class="nav-item"><a href="#" class="nav-link" id="btn-compile-run"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Compile + Run</a></li>
         </ul>
       </div>
     </div>
