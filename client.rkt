@@ -250,20 +250,10 @@
     )
   )
 
-;;; (define (do-logged-in)
-;;;   ($> (jQuery #js"#btn-save") (show))
-;;;   ($> (jQuery #js"#btn-logout") (show))
-;;;   ($> (jQuery #js"#btn-login") (hide)))
-
 (define (do-logged-in)
   (show-button (get-element-by-id "btn-save"))
   (show-button (get-element-by-id "btn-logout"))
   (hide-button (get-element-by-id "btn-login")))
-
-;;; (define (do-logged-out)
-;;;   ($> (jQuery #js"#btn-save") (hide))
-;;;   ($> (jQuery #js"#btn-logout") (hide))
-;;;   ($> (jQuery #js"#btn-login") (show)))
 
 (define (do-logged-out)
   (hide-button (get-element-by-id "btn-save"))
@@ -316,22 +306,14 @@
   )
 
 (define (show-error title msg)
-  (#js*.console.log (get-modal "#error-modal"))
-  ($> (get-modal "#error-modal")
-                  (show))
-  ($> (query-selector "#error-modal .modal-title")
-      (text (js-string title)))
-  ($> (query-selector "#error-modal p")
-      (text (js-string msg)))
-      )
-
-; (define (show-error title msg)
-;   ($> (#js.jQuery #js"#error-modal")
-;                   (modal #js"show"))
-;   ($> (#js.jQuery #js"#error-modal .modal-title")
-;       (text (js-string title)))
-;   ($> (#js.jQuery #js"#error-modal p")
-;       (text (js-string msg))))
+  (define error-modal (get-modal "#error-modal"))
+  (define modal-title (get-element-by-id "error-modal-title"))
+  (define modal-body (query-selector "#error-modal p"))
+  (#js*.console.log title)
+  (#js.error-modal.show)
+  ($/:= #js.modal-title.innerHTML (js-string title))
+  ($/:= #js.modal-body.innerHTML (js-string msg))
+)
 
 ;;-------------------------------------------------------------------------------
 
