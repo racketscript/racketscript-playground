@@ -264,19 +264,26 @@
   (#js*.fetch #js"/logout"))
 
 (define (load-gist id)
-  ($> (#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
-      (done (λ (data)
-              (set-racket-code ($ #js.data.files *gist-source-file* 'content))
+  ($> (#js*.fetch ($/binop + "https://api.github.com/gists/" id))
+      (then (λ (response)
+                (if (equal? #js.response.status 200)
+                  (#js.response.json)
+                  ($/throw ($/new (#js*.Error "Gist not found."))))))
+      (then (λ (data)
+                (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
                 [(and jscode ($/binop !== jscode #js""))
                  (set-javascript-code jscode)
                  (run)]
                 [else
-                 (compile #t)])))
-      (fail (λ (xhr)
-              (show-error "Error load Gist"
-                          #js.xhr.responseJSON.message)))))
+                 (compile #t)]))
+                )
+      (catch (λ (error) (show-error "Error load Gist"
+                           #js.error.message)))
+                
+    )
+  )
 
 (define (save)
   ;; this data will get forwarded to github
