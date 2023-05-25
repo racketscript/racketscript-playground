@@ -187,18 +187,6 @@
     (#js.cm-editor-console.setValue #js"Console Log:\n")
     (#js.cm-editor-jsout.setValue #js"Compiling ...")
 
-    ;;; ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
-    ;;;       (done (λ (data)
-    ;;;               (set-javascript-code data)
-    ;;;               (when execute?
-    ;;;                 (run))))
-    ;;;       (fail (λ (xhr status err)
-    ;;;               (#js.cm-editor-console.setValue
-    ;;;               ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
-    ;;;               (#js.cm-editor-jsout.setValue #js"")))
-    ;;;       (always (λ ()
-    ;;;                 (:= compiling? #f))))
-    ;;; TODO: Error handling for this POST req
     ($> (#js*.fetch #js"/compile" {$/obj 
                 [method "POST"]
                 [headers {$/obj
@@ -206,23 +194,23 @@
                 [body 
                   (#js*.JSON.stringify {$/obj [code (#js.cm-editor-racket.getValue)]})]
         })
-        (then (λ (response)
-                (if #js.response.ok
-                  (#js.response.text)
-                  (λ ()
+        (then (λ (response) (if #js.response.ok
+                                (#js.response.text)
+                                ($/throw ($/new (#js*.Error (js-string "Compile error"))))
+                            )
+        ))
+        (then (λ (data) (set-javascript-code data)
+                        (when execute? (run))
+        ))
+        (catch (λ ()
                     ((#js.cm-editor-console.setValue
                     ($/binop + #js"Compilation error:\n" #js"failed to compile"))
                     (#js.cm-editor-jsout.setValue #js""))
-                  )
-                  )
-                  ))
-        (then (λ (data)
-                (set-javascript-code data)
-                (when execute?
-                  (run))))
+        ))
         (then (λ ()
                   (:= compiling? #f)))
-      )))
+    )
+))
 
 ;;-----------------------------------------------------------------------------
 ;; Login, Save, and Load Gist
@@ -283,7 +271,7 @@
                            #js.error.message)))
                 
     )
-  )
+)
 
 (define (save)
   ;; this data will get forwarded to github
@@ -298,13 +286,22 @@
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
+  ; ($> (#js*.fetch #js"/save" {$/obj 
+  ;               [method "POST"]
+  ;               [headers {$/obj
+  ;                 [Content-type (js-string "application/json; charset=utf-8")]}]
+  ;               [body 
+  ;                 (#js*.JSON.stringify data)]
+  ;       })
+  ;     (then (λ (response) (#js*.console.log response))))
   ($> (#js.jQuery.post #js"/save" data)
       (done (λ (data)
               (define id #js.data)
               (:= #js.window.location.href ($/binop + #js"#gist/" id))))
       (fail (λ (e)
               (show-error "Error saving as Gist"
-                          #js.e.responseJSON.message)))))
+                          #js.e.responseJSON.message))))
+  )
 
 ;;-------------------------------------------------------------------------------
 
