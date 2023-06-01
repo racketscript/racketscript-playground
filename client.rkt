@@ -258,7 +258,7 @@
                   (#js.response.json)
                   ($/throw ($/new (#js*.Error "Gist not found."))))))
       (then (λ (data)
-                (#js*.console.log #js.data.files)
+                (#js*.console.log ($ #js.data.files *gist-source-file* 'content))
                 (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
@@ -269,7 +269,7 @@
                  (compile #t)]))
                 )
       (catch (λ (error) (show-error "Error load Gist"
-                           #js.error.message)))
+                           #js.error.message) (#js*.console.error error)))
                 
     )
 )
@@ -314,8 +314,6 @@
   (define error-modal (get-modal "#error-modal"))
   (define modal-title (get-element-by-id "error-modal-title"))
   (define modal-body (query-selector "#error-modal p"))
-  (#js*.console.log (js-string title))
-  (#js*.console.log (js-string msg))
   (#js.error-modal.show)
   ($/:= #js.modal-title.innerHTML (js-string title))
   ($/:= #js.modal-body.innerHTML (js-string msg))
