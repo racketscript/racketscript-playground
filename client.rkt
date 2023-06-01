@@ -227,7 +227,6 @@
   (if (#js.btn.classList.contains #js"d-none")
     0
     (#js.btn.classList.add #js"d-none")
-    ; (#js*.console.log (js-string (string-append "hiding button: " (js-string->string #js.btn.id))))
     )
   )
 
@@ -258,7 +257,6 @@
                   (#js.response.json)
                   ($/throw ($/new (#js*.Error "Gist not found."))))))
       (then (λ (data)
-                (#js*.console.log ($ #js.data.files *gist-source-file* 'content))
                 (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
