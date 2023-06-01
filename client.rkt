@@ -258,6 +258,7 @@
                   (#js.response.json)
                   ($/throw ($/new (#js*.Error "Gist not found."))))))
       (then (λ (data)
+                (#js*.console.log #js.data.files)
                 (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
@@ -286,21 +287,21 @@
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
-  ; ($> (#js*.fetch #js"/save" {$/obj 
-  ;               [method "POST"]
-  ;               [headers {$/obj
-  ;                 [Content-type (js-string "application/json; charset=utf-8")]}]
-  ;               [body 
-  ;                 (#js*.JSON.stringify data)]
-  ;       })
-  ;     (then (λ (response) (#js*.console.log response))))
-  ($> (#js.jQuery.post #js"/save" data)
-      (done (λ (data)
-              (define id #js.data)
-              (:= #js.window.location.href ($/binop + #js"#gist/" id))))
-      (fail (λ (e)
-              (show-error "Error saving as Gist"
-                          #js.e.responseJSON.message))))
+  ($> (#js*.fetch #js"/save" {$/obj 
+                [method "POST"]
+                [headers {$/obj
+                  [Content-type (js-string "application/json; charset=utf-8")]}]
+                [body 
+                  (#js*.JSON.stringify data)]
+        })
+      (then (λ (response) (#js*.console.log response))))
+  ; ($> (#js.jQuery.post #js"/save" data)
+  ;     (done (λ (data)
+  ;             (define id #js.data)
+  ;             (:= #js.window.location.href ($/binop + #js"#gist/" id))))
+  ;     (fail (λ (e)
+  ;             (show-error "Error saving as Gist"
+  ;                         #js.e.responseJSON.message))))
   )
 
 ;;-------------------------------------------------------------------------------
@@ -313,7 +314,8 @@
   (define error-modal (get-modal "#error-modal"))
   (define modal-title (get-element-by-id "error-modal-title"))
   (define modal-body (query-selector "#error-modal p"))
-  (#js*.console.log title)
+  (#js*.console.log (js-string title))
+  (#js*.console.log (js-string msg))
   (#js.error-modal.show)
   ($/:= #js.modal-title.innerHTML (js-string title))
   ($/:= #js.modal-body.innerHTML (js-string msg))
