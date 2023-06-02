@@ -2,7 +2,7 @@ Racketscript Playground
 =======================
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Docker](https://img.shields.io/docker/cloud/automated/vishesh/racketscript-playground)](https://hub.docker.com/r/racketscript/racketscript-playground)
+[![Docker](https://img.shields.io/docker/cloud/automated/racketscript/racketscript-playground)](https://hub.docker.com/r/racketscript/racketscript-playground)
 [![Try Online](https://img.shields.io/badge/try_it-online!-ff9900.svg)](http://play.racketscript.org)
 
 Playground for [RacketScript](https://github.com/racketscript/racketscript).
@@ -61,3 +61,9 @@ make -j4 quickrun
 RacketScript is licensed under [MIT license](LICENSE). Third-party
 libraries can be found over [here](static/index.html)
 and [here](package.json).
+
+## Troubleshooting
+
+- Running `docker` commands gives permission error
+
+[Add user name to `docker` user group](https://docs.docker.com/engine/install/linux-postinstall/): `sudo usermod -aG docker $USER`

@@ -2,7 +2,7 @@
 
 ;; RacketScript is an experimental Racket to JavaScript compiler,
 ;; which hopes to be practically useful someday. Source code is
-;; available at https://github.com/vishesh/racketscript
+;; available at https://github.com/racketscript/racketscript
 
 ;; We support modules, but we don't yet compile Racket's stdlib.
 (require racketscript/htdp/universe  racketscript/htdp/image  ;; replaces 2htdp/*
