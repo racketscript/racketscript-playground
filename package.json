@@ -5,7 +5,7 @@
     "main": "./js-build/dist/modules/app.rkt.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/vishesh/racketscript-playground"
+        "url": "https://github.com/racketscript/racketscript-playground"
     },
     "keywords": [
         "racket",
@@ -13,7 +13,7 @@
     ],
     "author": "Vishesh Yadav",
     "bugs": {
-        "url": "https://github.com/vishesh/racketscript/issues"
+        "url": "https://github.com/racketscript/racketscript/issues"
     },
     "dependencies": {
         "express": "^4.17.1",
