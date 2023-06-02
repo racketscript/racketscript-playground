@@ -9,13 +9,14 @@
          threading)
 
 ;; #js* references global JS objects.
-(let ([jquery #js*.jQuery])
-  ;; $> chains JavaScript calls.
-  ($> (jquery #js"body")
-      ;; #js"strings" are native JavaScript strings.
-      ;; "strings" are Racket strings (sequences of Unicode codepoints).
-      (css #js"margin" 0)
-      (css #js"padding" 0)))
+;; #js"<string>" is a quick syntax for writing native JS strings.
+;; "strings" are Racket strings (sequences of Unicode codepoints).
+(define body (#js*.document.querySelector #js"body"))
+
+;; #js.<var> references a RacketScript variable
+;; ($/:= var val) assigns val to var
+($/:= #js.body.style.margin 0)
+($/:= #js.body.style.padding 0)
 
 ;; (Listof Color) -> Image
 ;; Returns a single tile of carpet
@@ -63,12 +64,13 @@
                    (color 255 0 255)
                    (color 255 204 0)))))
 
-;; -> Non-Negative-Integet
+;; -> Non-Negative-Integer
 (define (viewport-width)
-  (- ($> (#js*.jQuery window) (width)) 5))
+  (- #js*.window.innerWidth 5))
 
-;; -> Non-Negative-Integet
+
+;; -> Non-Negative-Integer
 (define (viewport-height)
-  (- ($> (#js*.jQuery window) (height)) 5))
+  (- #js*.window.innerHeight 5))
 
 (print-image (welcome-image))
