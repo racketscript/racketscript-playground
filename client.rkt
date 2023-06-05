@@ -5,7 +5,6 @@
          racket/match
          racket/string
          (for-syntax racket/base))
-(define jQuery #js*.$)
 
 ;;----------------------------------------------------------------------------
 ;; Globals
