@@ -292,14 +292,9 @@
                 [body 
                   (#js*.JSON.stringify data)]
         })
-      (then (λ (response) (#js*.console.log response))))
-  ; ($> (#js.jQuery.post #js"/save" data)
-  ;     (done (λ (data)
-  ;             (define id #js.data)
-  ;             (:= #js.window.location.href ($/binop + #js"#gist/" id))))
-  ;     (fail (λ (e)
-  ;             (show-error "Error saving as Gist"
-  ;                         #js.e.responseJSON.message))))
+      (then (λ (response) (#js.response.text)))
+      (then (λ (data) (:= #js.window.location.href ($/binop + #js"#gist/" #js.data))))
+      (catch (λ (e) (show-error "Error saving as Gist" #js.e.responseJSON.message))))
   )
 
 ;;-------------------------------------------------------------------------------
