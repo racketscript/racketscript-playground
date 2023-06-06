@@ -2,7 +2,7 @@
 
 ;; RacketScript is an experimental Racket to JavaScript compiler,
 ;; which hopes to be practically useful someday. Source code is
-;; available at https://github.com/vishesh/racketscript
+;; available at https://github.com/racketscript/racketscript
 
 ;; We support modules, but we don't yet compile Racket's stdlib.
 (require racketscript/htdp/universe  racketscript/htdp/image  ;; replaces 2htdp/*
@@ -17,42 +17,57 @@
 ;; Racket environment. A dot `.` in identifier would split id and do a
 ;; JS object ref. Eg. `#js*.window.document` would translate to
 ;; `window.document`"
+(define (add-elem-to-body elem)
+  (#js*.document.body.appendChild elem)
+  elem)
 
-;; Here's a toy function to convert xexpr to DOM element using document.querySelector.
-(define (sexp->jq sexp)
-  (define (add-attrs jq attr-names attr-vals)
-    (foldl (λ (name val jq)
-             (#js.jq.attr ($/str name) ($/str val)))
-           jq
+;; Here's a toy function to convert xexpr to a DOM element.
+(define (sexp->html sexp)
+  (define (add-attr elem attr-name attr-val)
+    (#js.elem.setAttribute ($/str attr-name) ($/str attr-val))
+    elem)
+  (define (add-child elem child)
+    (#js.elem.append child)
+    elem)
+  (define (add-attrs elem attr-names attr-vals)
+    (foldl (λ (name val elem)
+              (add-attr elem name val))
+           elem
            attr-names
            attr-vals))
-  (define (add-childs jq childs)
-    (foldl (λ (child jq)
-             (#js.jq.append child))
-           jq
+  (define (add-childs elem childs)
+    (foldl (λ (child elem)
+             (add-child elem child))
+           elem
            childs))
   (match sexp
     [(list (app symbol->string tag-name)
-           (list [list (app symbol->string attr-names) (app sexp->jq attr-vals)] ...)
-           (app sexp->jq childs) ...)
-     (~> (format "<~a></~a>" tag-name tag-name)
-         ($/str _)
-         (#js*.document.querySelector _)
+           (list [list (app symbol->string attr-names) (app sexp->html attr-vals)] ...)
+           (app sexp->html childs) ...)
+     (~> ($/str tag-name)
+         (#js*.document.createElement _)
          (add-attrs _ attr-names attr-vals)
          (add-childs _ childs))]
     [(list tag-name childs ...)
-     (sexp->jq `(,tag-name () ,@childs))]
+     (sexp->html `(,tag-name () ,@childs))]
     [(? string? v) ($/str v)]
     [(? number? v) ($/str (number->string v))]))
 
 
-;; $> is exported by racketscript/interop to make chaining more
-;; convenient.
-($> (#js.document.addEventListener #js"DOMContentLoaded" 
-    (λ _
+(define (on-dom-loaded callback)
+  (if (or ($/binop === #js.document.readyState #js"interactive") ($/binop === #js.document.readyState #js"complete"))
+    (callback)
+    (#js.document.addEventListener #js"DOMContentLoaded" callback)))
+
+
+(define load-page-contents 
+  (λ _
        (displayln "DOM loaded!")
+        
+        ;; $> is exported by racketscript/interop to make chaining more
+        ;; convenient.
        ($> (#js*.document.querySelector #js"body")
-           (append (sexp->jq
+           (append (sexp->html
                     `(div
                       (h1 ([align "center"]) "Hello World!")
                       (div
@@ -65,7 +80,8 @@
                                "Playground on Github"))
                         (li (a ([href "http://www.racket-lang.org/"]
                                 [target "_blank"])
-                               "Racket Programming Language")))))))))))
+                               "Racket Programming Language"))))))))))
+
 
 ($> (#js.document.addEventListener #js"click" 
     (λ (e)
@@ -84,3 +100,5 @@
       ['() acc]
       [(cons hd tl) (sum/acc tl (+ acc hd))]))
   (sum/acc lst 0))
+
+(on-dom-loaded load-page-contents)
