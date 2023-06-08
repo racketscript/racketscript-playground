@@ -23,21 +23,19 @@
 
 ;; Here's a toy function to convert xexpr to a DOM element.
 (define (sexp->html sexp)
-  (define (add-attr elem attr-name attr-val)
+  (define (add-attr attr-name attr-val elem)
     (#js.elem.setAttribute ($/str attr-name) ($/str attr-val))
     elem)
-  (define (add-child elem child)
+  (define (add-child child elem)
     (#js.elem.append child)
     elem)
   (define (add-attrs elem attr-names attr-vals)
-    (foldl (λ (name val elem)
-              (add-attr elem name val))
+    (foldl add-attr
            elem
            attr-names
            attr-vals))
   (define (add-childs elem childs)
-    (foldl (λ (child elem)
-             (add-child elem child))
+    (foldl add-child
            elem
            childs))
   (match sexp
