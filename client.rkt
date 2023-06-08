@@ -59,10 +59,11 @@
 (define (query-selector query)
   (#js*.document.querySelector (js-string query)))
 
+(define (add-button-onclick button-id func)
+  (define btn-element (get-element-by-id button-id))
+  (#js.btn-element.addEventListener #js"click" func))
+
 (define (register-button-events!)
-  (define (add-button-onclick button-id func)
-    (define compile-btn (get-element-by-id button-id))
-    (#js.compile-btn.addEventListener #js"click" func))
   (add-button-onclick "btn-compile" (λ (e)
                (#js.e.preventDefault)
                (compile #f)))
