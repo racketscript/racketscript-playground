@@ -65,21 +65,20 @@
 
 (define (register-button-events!)
   (add-button-onclick "btn-compile" (λ (e)
-               (#js.e.preventDefault)
-               (compile #f)))
+                                      (#js.e.preventDefault)
+                                      (compile #f)))
   (add-button-onclick "btn-run" (λ (e)
-               (#js.e.preventDefault)
-               (run)))
+                                  (#js.e.preventDefault)
+                                  (run)))
   (add-button-onclick "btn-compile-run" (λ (e)
-               (#js.e.preventDefault)
-               (compile #t)))
+                                          (#js.e.preventDefault)
+                                          (compile #t)))
   (add-button-onclick "btn-logout" (λ (e)
-               (logout)
-               (do-logged-out)))
+                                     (logout)
+                                     (do-logged-out)))
   (add-button-onclick "btn-save" (λ (e)
-               (#js.e.preventDefault)
-               (save)))
-  )
+                                   (#js.e.preventDefault)
+                                   (save))))
 
 ;;-----------------------------------------------------------------------------
 ;; Editors
@@ -188,28 +187,24 @@
     (#js.cm-editor-jsout.setValue #js"Compiling ...")
 
     ($> (#js*.fetch #js"/compile" {$/obj 
-                [method "POST"]
-                [headers {$/obj
-                  [Content-type (js-string "application/json; charset=utf-8")]}]
-                [body 
-                  (#js*.JSON.stringify {$/obj [code (#js.cm-editor-racket.getValue)]})]
-        })
+                                   [method "POST"]
+                                   [headers {$/obj
+                                             [Content-type
+                                              (js-string "application/json; charset=utf-8")]}]
+                                   [body 
+                                    (#js*.JSON.stringify
+                                     {$/obj [code (#js.cm-editor-racket.getValue)]})]})
         (then (λ (response) (if #js.response.ok
                                 (#js.response.text)
-                                ($/throw ($/new (#js*.Error (js-string "Compile error"))))
-                            )
-        ))
+                                ($/throw ($/new (#js*.Error (js-string "Compile error")))))))
         (then (λ (data) (set-javascript-code data)
-                        (when execute? (run))
-        ))
+                (when execute? (run))))
         (catch (λ ()
-                    ((#js.cm-editor-console.setValue
-                    ($/binop + #js"Compilation error:\n" #js"failed to compile"))
-                    (#js.cm-editor-jsout.setValue #js""))
-        ))
+                 ((#js.cm-editor-console.setValue
+                   ($/binop + #js"Compilation error:\n" #js"failed to compile"))
+                  (#js.cm-editor-jsout.setValue #js""))))
         (then (λ ()
-                  (:= compiling? #f)))
-    )
+                (:= compiling? #f))))
 ))
 
 ;;-----------------------------------------------------------------------------
@@ -226,16 +221,12 @@
 (define (hide-button btn)
   (if (#js.btn.classList.contains #js"d-none")
     0
-    (#js.btn.classList.add #js"d-none")
-    )
-  )
+    (#js.btn.classList.add #js"d-none")))
 
 (define (show-button btn)
   (if (#js.btn.classList.contains #js"d-none")
     (#js.btn.classList.remove #js"d-none")
-    0
-    )
-  )
+    0))
 
 (define (do-logged-in)
   (show-button (get-element-by-id "btn-save"))
@@ -253,24 +244,21 @@
 (define (load-gist id)
   ($> (#js*.fetch ($/binop + "https://api.github.com/gists/" id))
       (then (λ (response)
-                (if (equal? #js.response.status 200)
+              (if (equal? #js.response.status 200)
                   (#js.response.json)
                   ($/throw ($/new (#js*.Error "Gist not found."))))))
       (then (λ (data)
-                (set-racket-code ($ #js.data.files *gist-source-file* 'content))
+              (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
                 [(and jscode ($/binop !== jscode #js""))
                  (set-javascript-code jscode)
                  (run)]
                 [else
-                 (compile #t)]))
-                )
-      (catch (λ (error) (show-error "Error load Gist"
-                           #js.error.message) (#js*.console.error error)))
-                
-    )
-)
+                 (compile #t)])))
+      (catch (λ (error)
+               (show-error "Error load Gist" #js.error.message)
+               (#js*.console.error error)))))
 
 (define (save)
   ;; this data will get forwarded to github
@@ -286,22 +274,19 @@
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
   ($> (#js*.fetch #js"/save" {$/obj 
-                [method "POST"]
-                [headers {$/obj
-                  [Content-type (js-string "application/json; charset=utf-8")]}]
-                [body 
-                  (#js*.JSON.stringify data)]
-        })
+                              [method "POST"]
+                              [headers {$/obj
+                                        [Content-type (js-string "application/json; charset=utf-8")]}]
+                              [body 
+                               (#js*.JSON.stringify data)]})
       (then (λ (response) (#js.response.text)))
       (then (λ (data) (:= #js.window.location.href ($/binop + #js"#gist/" #js.data))))
-      (catch (λ (e) (show-error "Error saving as Gist" #js.e.responseJSON.message))))
-  )
+      (catch (λ (e) (show-error "Error saving as Gist" #js.e.responseJSON.message)))))
 
 ;;-------------------------------------------------------------------------------
 
 (define (get-modal id)
-  ($/new (#js*.bootstrap.Modal (js-string id)))
-  )
+  ($/new (#js*.bootstrap.Modal (js-string id))))
 
 (define (show-error title msg)
   (define error-modal (get-modal "#error-modal"))
@@ -309,8 +294,7 @@
   (define modal-body (query-selector "#error-modal p"))
   (#js.error-modal.show)
   ($/:= #js.modal-title.innerHTML (js-string title))
-  ($/:= #js.modal-body.innerHTML (js-string msg))
-)
+  ($/:= #js.modal-body.innerHTML (js-string msg)))
 
 ;;-------------------------------------------------------------------------------
 
@@ -322,8 +306,8 @@
   ($> (#js*.fetch ($> examples (concat example-name #js".rkt.js")))
       (then (λ (response) (#js.response.text)))
       (then (λ (code)
-        (set-javascript-code code)
-        (run)))))
+              (set-javascript-code code)
+              (run)))))
 
 (define (reset-ui!)
   ;; Reset editors
@@ -345,10 +329,10 @@
     [("gist") (load-gist ($ parts 1))]
     [("example") (load-racket-example ($ parts 1))]
     [else
-      (let ([first-example
+     (let ([first-example
              ($ ($> (#js.document.querySelector #js"#example-menu a") hash
                     (split #js"/")) 1)])
-        (load-racket-example first-example))]))
+       (load-racket-example first-example))]))
 
 (define (main)
   (#js*.document.addEventListener #js"DOMContentLoaded"
