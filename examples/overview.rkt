@@ -70,10 +70,10 @@
                       (h1 ([align "center"]) "Hello World!")
                       (div
                        (ul
-                        (li (a ([href "https://github.com/vishesh/racketscript"]
+                        (li (a ([href "https://github.com/racketscript/racketscript"]
                                 [target "_blank"])
                                "RacketScript on Github"))
-                        (li (a ([href "https://github.com/vishesh/racketscript-playground"]
+                        (li (a ([href "https://github.com/racketscript/racketscript-playground"]
                                 [target "_blank"])
                                "Playground on Github"))
                         (li (a ([href "http://www.racket-lang.org/"]
