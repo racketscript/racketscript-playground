@@ -16,7 +16,7 @@
         "url": "https://github.com/racketscript/racketscript/issues"
     },
     "dependencies": {
-        "express": "^4.18.2",
+        "express": "^4.17.3",
         "express-session": "*",
         "body-parser": "*",
         "dotenv": "*"
