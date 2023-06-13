@@ -5,7 +5,6 @@
          racket/match
          racket/string
          (for-syntax racket/base))
-(define jQuery #js*.$)
 
 ;;----------------------------------------------------------------------------
 ;; Globals
@@ -54,27 +53,32 @@
                      [sizes        [$/array 75 25]]
                      [gutterSize   *split-gutter-size*]}))
 
+(define (get-element-by-id id)
+  (#js*.document.getElementById (js-string id)))
+
+(define (query-selector query)
+  (#js*.document.querySelector (js-string query)))
+
+(define (add-button-onclick button-id func)
+  (define btn-element (get-element-by-id button-id))
+  (#js.btn-element.addEventListener #js"click" func))
+
 (define (register-button-events!)
-  ($> (jQuery #js"#btn-compile")
-      (click (λ (e)
-               (#js.e.preventDefault)
-               (compile #f))))
-  ($> (jQuery #js"#btn-run")
-      (click (λ (e)
-               (#js.e.preventDefault)
-               (run))))
-  ($> (jQuery #js"#btn-compile-run")
-      (click (λ (e)
-               (#js.e.preventDefault)
-               (compile #t))))
-  ($> (jQuery #js"#btn-logout")
-      (click (λ (e)
-               (logout)
-               (do-logged-out))))
-  ($> (jQuery #js"#btn-save")
-      (click (λ (e)
-               (#js.e.preventDefault)
-               (save)))))
+  (add-button-onclick "btn-compile" (λ (e)
+                                      (#js.e.preventDefault)
+                                      (compile #f)))
+  (add-button-onclick "btn-run" (λ (e)
+                                  (#js.e.preventDefault)
+                                  (run)))
+  (add-button-onclick "btn-compile-run" (λ (e)
+                                          (#js.e.preventDefault)
+                                          (compile #t)))
+  (add-button-onclick "btn-logout" (λ (e)
+                                     (logout)
+                                     (do-logged-out)))
+  (add-button-onclick "btn-save" (λ (e)
+                                   (#js.e.preventDefault)
+                                   (save))))
 
 ;;-----------------------------------------------------------------------------
 ;; Editors
@@ -181,44 +185,69 @@
                      5000)
     (#js.cm-editor-console.setValue #js"Console Log:\n")
     (#js.cm-editor-jsout.setValue #js"Compiling ...")
-    ($> (#js.jQuery.post #js"/compile" {$/obj [code (#js.cm-editor-racket.getValue)]})
-        (done (λ (data)
-                (set-javascript-code data)
-                (when execute?
-                  (run))))
-        (fail (λ (xhr status err)
-                (#js.cm-editor-console.setValue
-                 ($/binop + #js"Compilation error:\n" #js.xhr.responseText))
-                (#js.cm-editor-jsout.setValue #js"")))
-        (always (λ ()
-                  (:= compiling? #f))))))
+
+    ($> (#js*.fetch #js"/compile" {$/obj 
+                                   [method "POST"]
+                                   [headers {$/obj
+                                             [Content-type
+                                              (js-string "application/json; charset=utf-8")]}]
+                                   [body 
+                                    (#js*.JSON.stringify
+                                     {$/obj [code (#js.cm-editor-racket.getValue)]})]})
+        (then (λ (response) (if #js.response.ok
+                                (#js.response.text)
+                                ($/throw ($/new (#js*.Error (js-string "Compile error")))))))
+        (then (λ (data) (set-javascript-code data)
+                (when execute? (run))))
+        (catch (λ ()
+                 ((#js.cm-editor-console.setValue
+                   ($/binop + #js"Compilation error:\n" #js"failed to compile"))
+                  (#js.cm-editor-jsout.setValue #js""))))
+        (then (λ ()
+                (:= compiling? #f))))
+))
 
 ;;-----------------------------------------------------------------------------
 ;; Login, Save, and Load Gist
 
 (define (check-logged-in)
-  (#js.jQuery.get #js"/isloggedin"
-   (λ (isloggedin)
-     (if isloggedin
-         (do-logged-in)
-         (do-logged-out)))))
+  ($> (#js*.fetch #js"/isloggedin")
+      (then (λ (response) (#js.response.json)))
+      (then (λ (isloggedin)
+            (if isloggedin
+                (do-logged-in)
+                (do-logged-out))))))
+
+(define (hide-button btn)
+  (if (#js.btn.classList.contains #js"d-none")
+    0
+    (#js.btn.classList.add #js"d-none")))
+
+(define (show-button btn)
+  (if (#js.btn.classList.contains #js"d-none")
+    (#js.btn.classList.remove #js"d-none")
+    0))
 
 (define (do-logged-in)
-  ($> (jQuery #js"#btn-save") (show))
-  ($> (jQuery #js"#btn-logout") (show))
-  ($> (jQuery #js"#btn-login") (hide)))
+  (show-button (get-element-by-id "btn-save"))
+  (show-button (get-element-by-id "btn-logout"))
+  (hide-button (get-element-by-id "btn-login")))
 
 (define (do-logged-out)
-  ($> (jQuery #js"#btn-save") (hide))
-  ($> (jQuery #js"#btn-logout") (hide))
-  ($> (jQuery #js"#btn-login") (show)))
+  (hide-button (get-element-by-id "btn-save"))
+  (hide-button (get-element-by-id "btn-logout"))
+  (show-button (get-element-by-id "btn-login")))
 
 (define (logout)
-  (#js.jQuery.get #js"/logout"))
+  (#js*.fetch #js"/logout"))
 
 (define (load-gist id)
-  ($> (#js.jQuery.get ($/binop + "https://api.github.com/gists/" id))
-      (done (λ (data)
+  ($> (#js*.fetch ($/binop + "https://api.github.com/gists/" id))
+      (then (λ (response)
+              (if (equal? #js.response.status 200)
+                  (#js.response.json)
+                  ($/throw ($/new (#js*.Error "Gist not found."))))))
+      (then (λ (data)
               (set-racket-code ($ #js.data.files *gist-source-file* 'content))
               (define jscode ($ #js.data.files *gist-javascript-file* 'content))
               (cond
@@ -227,9 +256,9 @@
                  (run)]
                 [else
                  (compile #t)])))
-      (fail (λ (xhr)
-              (show-error "Error load Gist"
-                          #js.xhr.responseJSON.message)))))
+      (catch (λ (error)
+               (show-error "Error load Gist" #js.error.message)
+               (#js*.console.error error)))))
 
 (define (save)
   ;; this data will get forwarded to github
@@ -244,23 +273,28 @@
                                 [content (#js.cm-editor-racket.getValue)]}]
          [,*gist-javascript-file* ,{$/obj
                                     [content (#js.cm-editor-jsout.getValue)]}]))]})
-  ($> (#js.jQuery.post #js"/save" data)
-      (done (λ (data)
-              (define id #js.data)
-              (:= #js.window.location.href ($/binop + #js"#gist/" id))))
-      (fail (λ (e)
-              (show-error "Error saving as Gist"
-                          #js.e.responseJSON.message)))))
+  ($> (#js*.fetch #js"/save" {$/obj 
+                              [method "POST"]
+                              [headers {$/obj
+                                        [Content-type (js-string "application/json; charset=utf-8")]}]
+                              [body 
+                               (#js*.JSON.stringify data)]})
+      (then (λ (response) (#js.response.text)))
+      (then (λ (data) (:= #js.window.location.href ($/binop + #js"#gist/" #js.data))))
+      (catch (λ (e) (show-error "Error saving as Gist" #js.e.responseJSON.message)))))
 
 ;;-------------------------------------------------------------------------------
 
+(define (get-modal id)
+  ($/new (#js*.bootstrap.Modal (js-string id))))
+
 (define (show-error title msg)
-  ($> (#js.jQuery #js"#error-modal")
-                  (modal #js"show"))
-  ($> (#js.jQuery #js"#error-modal .modal-title")
-      (text (js-string title)))
-  ($> (#js.jQuery #js"#error-modal p")
-      (text (js-string msg))))
+  (define error-modal (get-modal "#error-modal"))
+  (define modal-title (get-element-by-id "error-modal-title"))
+  (define modal-body (query-selector "#error-modal p"))
+  (#js.error-modal.show)
+  ($/:= #js.modal-title.innerHTML (js-string title))
+  ($/:= #js.modal-body.innerHTML (js-string msg)))
 
 ;;-------------------------------------------------------------------------------
 
@@ -272,8 +306,8 @@
   ($> (#js*.fetch ($> examples (concat example-name #js".rkt.js")))
       (then (λ (response) (#js.response.text)))
       (then (λ (code)
-        (set-javascript-code code)
-        (run)))))
+              (set-javascript-code code)
+              (run)))))
 
 (define (reset-ui!)
   ;; Reset editors
@@ -295,10 +329,10 @@
     [("gist") (load-gist ($ parts 1))]
     [("example") (load-racket-example ($ parts 1))]
     [else
-      (let ([first-example
+     (let ([first-example
              ($ ($> (#js.document.querySelector #js"#example-menu a") hash
                     (split #js"/")) 1)])
-        (load-racket-example first-example))]))
+       (load-racket-example first-example))]))
 
 (define (main)
   (#js*.document.addEventListener #js"DOMContentLoaded"
