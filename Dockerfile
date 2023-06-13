@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM racket/racket:8.7-full
 
-RUN apt-get update -y \
+RUN apt-get update -y --allow-releaseinfo-change \
     && apt-get install -y --no-install-recommends xz-utils make \
     && apt-get clean
 
