@@ -52,6 +52,7 @@ examples/%.rkt.js: examples/%.rkt
 	@echo "Compiling $<..."
 	racks $(RACKS_FLAGS) $(RACKS_ARGS) $(RACKS_EXAMPLE_FLAGS) -d build/examples $<
 	cp build/examples/modules/$*.rkt.js examples/
+	
 
 clean:
 	rm -rf build/ examples/*.rkt.js
