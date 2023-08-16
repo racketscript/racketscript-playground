@@ -1,7 +1,7 @@
 #lang racketscript/base
 
 (require racket/list
-         racketscript-universe
+         racketscript/htdp/peer-universe
          racketscript/htdp/image)
 
 ;; Example based on https://course.khoury.northeastern.edu/cs5010sp15/set08.html

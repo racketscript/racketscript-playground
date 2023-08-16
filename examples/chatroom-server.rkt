@@ -1,6 +1,6 @@
 #lang racketscript/base
 
-(require racketscript-universe
+(require racketscript/htdp/peer-universe
          racketscript/htdp/image)
 
 ;; Example based on https://course.khoury.northeastern.edu/cs5010sp15/set08.html
