@@ -8,10 +8,83 @@
 ;; WorldState:
 ;; (list ListOf<iWorld> ListOf<EventMessage>)
 
-;; TODO:
-;; Create methods to:
-;; - generate mails for all clients
-;; - add event to the event list
+
+;; 
+;; Funny words courtesy of ChatGPT
+;; 
+
+(define funny-adjectives (list "bumbling"
+                               "quizzical"
+                               "wacky"
+                               "zany"
+                               "fluffy"
+                               "bizarre"
+                               "hilarious"
+                               "whimsical"
+                               "absurd"
+                               "goofy"
+                               "ridiculous"
+                               "loopy"
+                               "nutty"
+                               "eccentric"
+                               "silly"
+                               "quirky"
+                               "jovial"
+                               "giggly"
+                               "mirthful"
+                               "haphazard"
+                               "chucklesome"
+                               "fanciful"
+                               "droll"
+                               "boisterous"
+                               "offbeat"
+                               "hysterical"
+                               "peculiar"
+                               "lighthearted"
+                               "playful"
+                               "amusing"))
+
+(define funny-nouns (list "banana"
+                          "sock-puppet"
+                          "llama"
+                          "rubber-chicken"
+                          "pajamas"
+                          "gobbledygook"
+                          "poodle"
+                          "bubble-wrap"
+                          "tater-tot"
+                          "cheeseburger"
+                          "wiggle"
+                          "snorkel"
+                          "ticklemonster"
+                          "jello"
+                          "balloon-animal"
+                          "slinky"
+                          "spaghetti"
+                          "bumblebee"
+                          "dingleberry"
+                          "flapdoodle"
+                          "doohickey"
+                          "noodle"
+                          "gobbledygook"
+                          "whatchamacallit"
+                          "snickerdoodle"
+                          "popsicle"
+                          "gigglesnort"
+                          "wobble"
+                          "hootenanny"
+                          "noodle"))
+
+(define (generate-id)
+  (define adjective (list-ref funny-adjectives 
+                              (random (length funny-adjectives))))
+  (define noun (list-ref funny-nouns
+                         (random (length funny-nouns))))
+  (format "~a-~a" adjective noun))
+
+;; 
+;; Helper functions
+;; 
 
 (define (make-client-list ws)
   (foldl (lambda (iw result) (append result (list (iworld-name iw)))) '() ws))
@@ -28,6 +101,11 @@
 (define (client-list-mails ws)
   (define client-list (make-client-list ws))
   (mail-to-all ws (list 'userlist client-list)))
+
+
+;; 
+;; Event handlers
+;; 
 
 (define (handle-new ws iw)
   (define ws* (append ws (list iw)))
@@ -51,7 +129,7 @@
 (define (start-universe root)
   (universe #:dom-root root
             '()
-            [server-id     "my-server"]
+            [server-id     (generate-id)]
             [on-new        handle-new]
             [on-msg        handle-msg]
             [on-disconnect handle-disconnect]))
