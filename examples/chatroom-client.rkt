@@ -25,6 +25,13 @@
 (define (slice-list l start stop)
   (take (drop l start) (- stop start)))
 
+(define (list-contains list v)
+  (number? (index-of list v)))
+
+(define (not-in-list bigger-list smaller-list)
+  (list-ref (filter (λ (el) (not (list-contains smaller-list el))) bigger-list) 0))
+
+
 ;;
 ;; Constants
 ;;
@@ -169,10 +176,22 @@
 
   (define msg-type (list-ref msg 0))
   (case msg-type
-        [(userlist)   (set! users (list-ref msg 1))]
-        [(broadcast)  (set! messages (append messages (list msg)))])
+        [(userlist)     (begin
+                          (define users* (list-ref msg 1))
+                          
+                          (set! messages 
+                                (append messages 
+                                        (if (> (length users*) (length users))
+                                            (list (list 'join
+                                                         (list-ref users*
+                                                                   (- (length users*) 1))))
+                                            (list (list 'leave
+                                                         (not-in-list users users*))))))
+                          (set! users users*))]
+        [(broadcast)    (set! messages (append messages (list msg)))])
         
   (list username users messages input))
+
 
 ;;
 ;; Start func
@@ -189,7 +208,7 @@
 
 
 ;;
-;; Join UI
+;; User login UI
 ;;
 
 (define join-form         (#js*.document.createElement #js"form"))

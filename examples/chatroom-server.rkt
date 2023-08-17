@@ -44,7 +44,8 @@
                                "playful"
                                "amusing"))
 
-(define funny-nouns (list "banana"
+(define funny-nouns (list "goober"
+                          "banana"
                           "sock-puppet"
                           "llama"
                           "rubber-chicken"
