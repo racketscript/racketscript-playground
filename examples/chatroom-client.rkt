@@ -6,12 +6,6 @@
 
 ;; Example based on https://course.khoury.northeastern.edu/cs5010sp15/set08.html
 
-;; TODO: Implement encoding/decoding of racket elements so that complex
-;; datatypes like MsgFromServer can be more easily sent
-
-;; UserName
-;; String of only letters and numbers between 1 and 12 chars long
-
 ;; MsgFromServer
 ;; (list 'userlist ListOf<UserName>) ;; don't include in event-messages
 ;; (list 'join UserName)
@@ -20,12 +14,9 @@
 ;; (list 'private UserName Message) ;; a private msg from a user
 ;; (list 'broadcast UserName Message) ;; a public msg from a user
 
-;; Current solution: JSON version of MsgFromServer
-;; {"type": "userlist", "content": Array<UserName : js-string>}
-;; {"type": "broadcast", "sender": <UserName : js-string>, "content": js-string}
-
 ;; WorldState
 ;; (list client-name<UserName> connected-users<ListOf<UserName>> event-messages<ListOf<MsgFromServer>> curr-input<String>)
+
 
 ;; 
 ;; Helper functions
@@ -187,13 +178,51 @@
 ;; Start func
 ;;
 
-(define (start-world username root)
-  (big-bang #:dom-root root
+(define (start-world username server-id)
+  (big-bang #:dom-root #js*.document.body
             (list username '() '() "")
             [to-draw draw]
             [on-key handle-key]
             [on-receive handle-receive]
             [name username]
-            [register "my-server"]))
+            [register server-id]))
 
-(start-world "test user")
+
+;;
+;; Join UI
+;;
+
+(define join-form         (#js*.document.createElement #js"form"))
+(define name-label        (#js*.document.createElement #js"label"))
+(define br-1              (#js*.document.createElement #js"br"))
+(define name-input        (#js*.document.createElement #js"input"))
+(define br-2              (#js*.document.createElement #js"br"))
+(define server-id-label   (#js*.document.createElement #js"label"))
+(define br-3              (#js*.document.createElement #js"br"))
+(define server-id-input   (#js*.document.createElement #js"input"))
+(define br-4              (#js*.document.createElement #js"br"))
+(define form-submit       (#js*.document.createElement #js"input"))
+
+($/:= #js.name-label.innerHTML        #js"Username")
+($/:= #js.server-id-label.innerHTML   #js"Server's Peer ID")
+($/:= #js.name-input.placeholder      #js"my_name1234")
+($/:= #js.server-id-input.placeholder #js"42adwadwa#$021")
+($/:= #js.form-submit.type            #js"submit")
+($/:= #js.form-submit.value           #js"Join!")
+
+(for-each (λ (el)
+            (#js.join-form.appendChild el)
+            0)
+          (list name-label br-1 name-input
+                br-2
+                server-id-label br-3 server-id-input
+                br-4
+                form-submit))
+
+($/:= #js.join-form.onsubmit 
+      (λ ()
+        (start-world (js-string->string #js.name-input.value)
+                     (js-string->string #js.server-id-input.value))
+        (#js.join-form.remove)))
+
+(#js*.document.body.appendChild join-form)
