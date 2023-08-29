@@ -5,7 +5,8 @@
 (require racketscript/interop
          racketscript/browser
          racketscript/htdp/image
-         racketscript/htdp/universe)
+         racketscript/htdp/universe
+         "stub2.rkt")
 
 ;; interop
 assoc->object
@@ -19,6 +20,9 @@ square
 
 ;; universe
 big-bang
+
+;; peer-universe
+(peer-universe-imports)
 
 ;; list
 foldr

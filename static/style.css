@@ -148,3 +148,39 @@ body {
 ul.nav a:hover { color: #f33 !important; }
 
 .navbar-brand:hover {color: #f33 !important; }
+
+/* Fixing menu collapse width */
+
+#example-menu {
+    width: fit-content;
+}
+
+/* Multi-level dropdown */
+
+.dropdown-menu li {
+    position: relative;
+}
+
+span.dropdown-item {
+    cursor: default;
+}
+
+.dropdown-menu > li:hover > span.dropdown-item {
+    color: #f33;
+}
+
+.dropdown-menu .dropdown-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -7px;
+}
+
+.dropdown-menu .dropdown-submenu-left {
+    right: 100%;
+    left: auto;
+}
+
+.dropdown-menu > li:hover > .dropdown-submenu {
+    display: block;
+}
