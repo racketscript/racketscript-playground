@@ -5,7 +5,8 @@
 (require racketscript/interop
          racketscript/browser
          racketscript/htdp/image
-         racketscript/htdp/universe)
+         racketscript/htdp/universe
+         rackt)
 
 ;; interop
 assoc->object
@@ -55,3 +56,7 @@ vector-member
 
 ;; string
 string-contains?
+
+;; rackt
+<el
+render
